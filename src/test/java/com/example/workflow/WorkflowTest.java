@@ -15,23 +15,23 @@ import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.assertT
 @RunWith(SpringRunner.class)
 public class WorkflowTest extends AbstractProcessEngineRuleTest {
 
-  @Autowired
-  public RuntimeService runtimeService;
+    @Autowired
+    public RuntimeService runtimeService;
 
-  @Test
-  public void shouldExecuteHappyPath() {
-    // given
-    String processDefinitionKey = "sample-bpm-project-process";
+    @Test
+    public void shouldExecuteHappyPath() {
+        // given
+        String processDefinitionKey = "sample-bpm-project-process";
 
-    // when
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(processDefinitionKey);
+        // when
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(processDefinitionKey);
 
-    // then
-    assertThat(processInstance).isStarted()
-        .task()
-        .hasDefinitionKey("say-hello")
-        .hasCandidateUser("a")
-        .isNotAssigned();
-  }
+        // then
+        assertThat(processInstance).isStarted()
+                .task()
+                .hasDefinitionKey("say-hello")
+                .hasCandidateUser("a")
+                .isNotAssigned();
+    }
 
 }
