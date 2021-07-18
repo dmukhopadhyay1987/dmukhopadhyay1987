@@ -1,0 +1,23 @@
+camunda:
+  admin-user:
+    id: a
+    password: a
+  bpm:
+    database:
+      type: postgres
+    table-prefix: camunda.
+    schema-update: true
+
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  datasource:
+    driverClassName: org.postgresql.Driver
+    #DB connection:
+    url: jdbc:postgresql://localhost:5432/
+    username: postgres
+    password: Pass@2021

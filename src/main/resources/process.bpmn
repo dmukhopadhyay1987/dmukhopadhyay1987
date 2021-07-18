@@ -1,38 +1,136 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_0fr9mxs" targetNamespace="http://bpmn.io/schema/bpmn">
-  <bpmn:process id="sample-bpm-project-process" isExecutable="true">
-    <bpmn:startEvent id="StartEvent_1">
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<definitions xmlns:bioc="http://bpmn.io/schema/bpmn/biocolor/1.0" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:color="http://www.omg.org/spec/BPMN/non-normative/color/1.0" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:tns="http://bpmn.io/schema/bpmn" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:yaoqiang="http://bpmn.sourceforge.net" exporter="Camunda Modeler" exporterVersion="4.9.0" expressionLanguage="http://www.w3.org/1999/XPath" id="Definitions_0fr9mxs" name="" targetNamespace="http://bpmn.io/schema/bpmn" typeLanguage="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://bpmn.sourceforge.net/schemas/BPMN20.xsd">
+  <bpmn:process camunda:historyTimeToLive="1" id="sample-bpm-project-process" isClosed="false" isExecutable="true" processType="None">
+    <bpmn:extensionElements>
+      <camunda:executionListener delegateExpression="${renewalProcessStartListener}" event="start"/>
+      <camunda:executionListener delegateExpression="${renewalProcessStartListener}" event="end"/>
+      <yaoqiang:description/>
+      <camunda:executionListener delegateExpression="${renewalProcessStartListener}" event="start"/>
+      <camunda:executionListener delegateExpression="${renewalProcessStartListener}" event="end"/>
+      <yaoqiang:pageFormat height="841.8897637795276" imageableHeight="831.8897637795276" imageableWidth="588.1102362204724" imageableX="5.0" imageableY="5.0" orientation="0" width="598.1102362204724"/>
+      <yaoqiang:page background="#FFFFFF" horizontalCount="1" verticalCount="1"/>
+    </bpmn:extensionElements>
+    <bpmn:startEvent id="startRenewal" isInterrupting="true" name="Start Renewal" parallelMultiple="false">
       <bpmn:outgoing>SequenceFlow_1fp17al</bpmn:outgoing>
+      <bpmn:outputSet/>
     </bpmn:startEvent>
-    <bpmn:sequenceFlow id="SequenceFlow_1fp17al" sourceRef="StartEvent_1" targetRef="say-hello" />
+    <bpmn:sequenceFlow id="SequenceFlow_1fp17al" sourceRef="startRenewal" targetRef="takeInput"/>
     <bpmn:endEvent id="EndEvent_0x6ir2l">
-      <bpmn:incoming>SequenceFlow_16gzt2m</bpmn:incoming>
+      <bpmn:incoming>Flow_1lqk8ee</bpmn:incoming>
+      <bpmn:inputSet/>
     </bpmn:endEvent>
-    <bpmn:sequenceFlow id="SequenceFlow_16gzt2m" sourceRef="say-hello" targetRef="EndEvent_0x6ir2l" />
-    <bpmn:userTask id="say-hello" name="Say hello to&#10;a" camunda:candidateUsers="a">
-      <bpmn:incoming>SequenceFlow_1fp17al</bpmn:incoming>
-      <bpmn:outgoing>SequenceFlow_16gzt2m</bpmn:outgoing>
+    <bpmn:sequenceFlow id="Flow_1d2btb4" sourceRef="takeInput" targetRef="getLoanInfo"/>
+    <bpmn:sequenceFlow id="Flow_1lqk8ee" sourceRef="viewInput" targetRef="EndEvent_0x6ir2l"/>
+    <bpmn:userTask completionQuantity="1" id="viewInput" implementation="##unspecified" isForCompensation="false" name="View Input" startQuantity="1">
+      <bpmn:incoming>Flow_1fwvy1e</bpmn:incoming>
+      <bpmn:outgoing>Flow_1lqk8ee</bpmn:outgoing>
     </bpmn:userTask>
+    <bpmn:userTask completionQuantity="1" id="takeInput" implementation="##unspecified" isForCompensation="false" name="Take Input" startQuantity="1">
+      <bpmn:incoming>SequenceFlow_1fp17al</bpmn:incoming>
+      <bpmn:outgoing>Flow_1d2btb4</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask camunda:delegateExpression="${getLoanInfo}" completionQuantity="1" id="getLoanInfo" implementation="##WebService" isForCompensation="false" name="Get Loan Info" startQuantity="1">
+      <bpmn:incoming>Flow_1d2btb4</bpmn:incoming>
+      <bpmn:outgoing>Flow_0xceahg</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_1fwvy1e" sourceRef="getProposalInfo" targetRef="viewInput"/>
+    <bpmn:serviceTask camunda:delegateExpression="${getProposalInfo}" completionQuantity="1" id="getProposalInfo" implementation="##WebService" isForCompensation="false" name="getProposalInfo" startQuantity="1">
+      <bpmn:incoming>Flow_1jvudl8</bpmn:incoming>
+      <bpmn:outgoing>Flow_1fwvy1e</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_0xceahg" sourceRef="getLoanInfo" targetRef="proposalRequestMapper"/>
+    <bpmn:sequenceFlow id="Flow_1jvudl8" sourceRef="proposalRequestMapper" targetRef="getProposalInfo"/>
+    <bpmn:serviceTask camunda:delegateExpression="${proposalRequestMapper}" completionQuantity="1" id="proposalRequestMapper" implementation="##WebService" isForCompensation="false" name="Proposal Request Mapper" startQuantity="1">
+      <bpmn:incoming>Flow_0xceahg</bpmn:incoming>
+      <bpmn:outgoing>Flow_1jvudl8</bpmn:outgoing>
+    </bpmn:serviceTask>
   </bpmn:process>
-  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
-    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="sample-bpm-project-process">
-      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
-        <dc:Bounds x="179" y="99" width="36" height="36" />
+  <bpmndi:BPMNDiagram id="Yaoqiang_Diagram-sample-bpm-project-process" name="Untitled Diagram" resolution="96.0">
+    <bpmndi:BPMNPlane bpmnElement="sample-bpm-project-process">
+      <bpmndi:BPMNShape bpmnElement="startRenewal" id="Yaoqiang-startRenewal">
+        <dc:Bounds height="32.0" width="32.0" x="142.0" y="99.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="18.8" width="85.0" x="118.5" y="142.08"/>
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="SequenceFlow_1fp17al_di" bpmnElement="SequenceFlow_1fp17al">
-        <di:waypoint x="215" y="117" />
-        <di:waypoint x="270" y="117" />
+      <bpmndi:BPMNShape bpmnElement="EndEvent_0x6ir2l" id="Yaoqiang-EndEvent_0x6ir2l">
+        <dc:Bounds height="32.0" width="32.0" x="1182.0" y="99.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="18.8" width="6.0" x="1195.0" y="139.6"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="viewInput" id="Yaoqiang-viewInput">
+        <dc:Bounds height="80.0" width="100.0" x="990.0" y="77.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="18.8" width="65.0" x="1007.5" y="109.6"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="takeInput" id="Yaoqiang-takeInput">
+        <dc:Bounds height="80.0" width="100.0" x="260.0" y="77.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="18.8" width="65.0" x="277.5" y="109.6"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="getLoanInfo" id="Yaoqiang-getLoanInfo">
+        <dc:Bounds height="80.0" width="100.0" x="440.0" y="77.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="18.8" width="82.0" x="449.0" y="109.6"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="getProposalInfo" id="Yaoqiang-getProposalInfo">
+        <dc:Bounds height="80.0" width="100.0" x="810.0" y="77.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="32.8" width="87.0" x="816.5" y="102.6"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="proposalRequestMapper" id="Yaoqiang-proposalRequestMapper">
+        <dc:Bounds height="80.0" width="100.0" x="620.0" y="77.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="46.8" width="55.0" x="642.5" y="95.6"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="Flow_0xceahg" id="Yaoqiang-Flow_0xceahg">
+        <di:waypoint x="540.0" y="117.0"/>
+        <di:waypoint x="620.0" y="117.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="18.8" width="6.0" x="577.0" y="107.6"/>
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="EndEvent_0x6ir2l_di" bpmnElement="EndEvent_0x6ir2l">
-        <dc:Bounds x="432" y="99" width="36" height="36" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="SequenceFlow_16gzt2m_di" bpmnElement="SequenceFlow_16gzt2m">
-        <di:waypoint x="370" y="117" />
-        <di:waypoint x="432" y="117" />
+      <bpmndi:BPMNEdge bpmnElement="SequenceFlow_1fp17al" id="Yaoqiang-SequenceFlow_1fp17al">
+        <di:waypoint x="174.0" y="115.0"/>
+        <di:waypoint x="260.0" y="117.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="18.8" width="6.0" x="214.0" y="106.6"/>
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="UserTask_08mft2c_di" bpmnElement="say-hello">
-        <dc:Bounds x="270" y="77" width="100" height="80" />
-      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="Flow_1lqk8ee" id="Yaoqiang-Flow_1lqk8ee">
+        <di:waypoint x="1090.0" y="117.0"/>
+        <di:waypoint x="1182.0" y="115.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="18.8" width="6.0" x="1133.0" y="106.6"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="Flow_1fwvy1e" id="Yaoqiang-Flow_1fwvy1e">
+        <di:waypoint x="910.0" y="117.0"/>
+        <di:waypoint x="990.0" y="117.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="18.8" width="6.0" x="947.0" y="107.6"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="Flow_1jvudl8" id="Yaoqiang-Flow_1jvudl8">
+        <di:waypoint x="720.0" y="117.0"/>
+        <di:waypoint x="810.0" y="117.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="18.8" width="6.0" x="762.0" y="107.6"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="Flow_1d2btb4" id="Yaoqiang-Flow_1d2btb4">
+        <di:waypoint x="360.0" y="117.0"/>
+        <di:waypoint x="440.0" y="117.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="18.8" width="6.0" x="397.0" y="107.6"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
-</bpmn:definitions>
+</definitions>
