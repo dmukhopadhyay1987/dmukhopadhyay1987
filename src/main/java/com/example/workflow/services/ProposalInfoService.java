@@ -9,12 +9,12 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class ProposalInfoService {
 
-	public ProposalResponseDto getProposal(ProposalRequestDto loanInfo) {
+	public ProposalResponseDto getProposal(ProposalRequestDto proposalRequestDto) {
 		log.info("Inside >> {}",
 				this.getClass().getName());
 		var result = new ProposalResponseDto();
-		result.setLoan(loanInfo.getLoanNum());
-		result.setCustomerId(loanInfo.getCustId());
+		result.setLoan(proposalRequestDto.getLoanNum());
+		result.setCustomerId(proposalRequestDto.getCustId());
 		result.setProposedTerm(20);
 		result.setProposedInterestRate(2.1);
 		return result;

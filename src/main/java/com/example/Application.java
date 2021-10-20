@@ -1,4 +1,4 @@
-package com.example.workflow;
+package com.example;
 
 import org.dozer.DozerBeanMapper;
 import org.springframework.boot.SpringApplication;
