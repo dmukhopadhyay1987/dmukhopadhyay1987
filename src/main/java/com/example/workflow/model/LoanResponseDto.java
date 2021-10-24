@@ -5,8 +5,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
-
 @Component
 @Getter
 @Setter
@@ -17,7 +15,5 @@ public class LoanResponseDto {
 	String customerId;
 	Double remainingPrincipal;
 	Integer remainingTerm;
-	Date loanStartDate;
-	Date loanEndDate;
 	String productType;
 }

@@ -3,7 +3,7 @@
   <bpmn:process id="sample-bpm-project-process" isExecutable="true" camunda:historyTimeToLive="1">
     <bpmn:extensionElements>
       <camunda:executionListener delegateExpression="${renewalProcessStartListener}" event="start" />
-      <camunda:executionListener delegateExpression="${renewalProcessStartListener}" event="end" />
+      <camunda:executionListener delegateExpression="${renewalProcessEndListener}" event="end" />
     </bpmn:extensionElements>
     <bpmn:startEvent id="startRenewal" name="Start Renewal">
       <bpmn:outgoing>SequenceFlow_1fp17al</bpmn:outgoing>

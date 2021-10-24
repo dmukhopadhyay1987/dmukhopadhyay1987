@@ -6,8 +6,6 @@ import lombok.Setter;
 import org.dozer.Mapping;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
-
 @Component
 @Getter
 @Setter
@@ -21,10 +19,6 @@ public class ProposalRequestDto {
 	Double remPrincipalAmt;
 	@Mapping("remainingTerm")
 	Integer remTerm;
-	@Mapping("loanStartDate")
-	Date startDate;
-	@Mapping("loanEndDate")
-	Date expDate;
 	@Mapping("productType")
 	String product;
 }

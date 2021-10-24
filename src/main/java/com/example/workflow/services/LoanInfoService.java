@@ -18,8 +18,6 @@ public class LoanInfoService {
 		result.setCustomerId("WE4F3W5E4F35E4F");
 		result.setRemainingPrincipal(200000.0);
 		result.setProductType("JHD");
-		result.setLoanStartDate(new Date());
-		result.setLoanEndDate(new Date());
 		return result;
 	}
 }

@@ -21,3 +21,7 @@ spring:
     url: jdbc:postgresql://localhost:5432/
     username: postgres
     password: Pass@2021
+
+
+logging.level.com.example.feign.GitFeign: DEBUG
+feign.client.config.default.loggerLevel: full
