@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import feign.RequestInterceptor;
+import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -32,5 +33,10 @@ public class GitFeignConfig {
 			requestTemplate.header("accept", " application/vnd.github.v3.full+json");
 			requestTemplate.header("Authorization", "Token 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");
 		};
+	}
+
+	@Bean
+	public KeyGenerator keyGen() {
+		return (target, method, params) -> params[0];
 	}
 }

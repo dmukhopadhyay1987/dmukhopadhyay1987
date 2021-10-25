@@ -7,6 +7,7 @@ import com.example.feign.model.BranchUpdateRequest;
 import com.example.feign.model.CommitRequest;
 import com.example.feign.model.MergeRequest;
 import com.example.feign.model.TreeRequest;
+import com.example.vo.Blob;
 import com.example.vo.Branch;
 import com.example.vo.Commit;
 import com.example.vo.Tree;
@@ -15,6 +16,8 @@ import com.example.workflow.model.ProcessInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.stereotype.Service;
 
 import java.util.Base64;
@@ -22,6 +25,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@EnableCaching
 public class PersistenceService {
 
 	@Autowired
@@ -41,6 +45,25 @@ public class PersistenceService {
 	@Autowired
 	private MergeRequest mergeRequest;
 
+	private List<Branch> branches() {
+		return gitClient.branches();
+	}
+
+	@Cacheable(cacheNames = "blobs", keyGenerator = "keyGen", sync = true)
+	private Blob blob(String sha) {
+		return gitClient.blob(sha);
+	}
+
+	@Cacheable(cacheNames = "blobs", keyGenerator = "keyGen", sync = true)
+	private Tree tree(String sha) {
+		return gitClient.tree(sha);
+	}
+
+	@Cacheable(cacheNames = "blobs", keyGenerator = "keyGen", sync = true)
+	private Commit commit(String sha) {
+		return gitClient.commit(sha);
+	}
+
 	public Branch branch(String branchName) {
 		List<Branch> branches = branches();
 		if (branches.stream().noneMatch(b -> b.getName().equals(branchName))) {
@@ -52,17 +75,13 @@ public class PersistenceService {
 		return branches.stream().filter(b -> b.getName().equals(branchName)).findFirst().orElseThrow();
 	}
 
-	private List<Branch> branches() {
-		return gitClient.branches();
-	}
-
 	@SneakyThrows
 	public Commit save(ProcessInfo processInfo, String message) {
 		String branchName = processInfo.getLoanNumber();
 		Branch branch = branch(branchName);
 		blobRequest.setContent(objectMapper.writeValueAsString(processInfo));
-		Commit lastCommit = gitClient.commit(branch.getCommit().getSha());
-		List<TreeDetail> modifiedBaseTrees = gitClient.tree(lastCommit.getCommitDetails().getTree().getSha())
+		Commit lastCommit = commit(branch.getCommit().getSha());
+		List<TreeDetail> modifiedBaseTrees = tree(lastCommit.getCommitDetails().getTree().getSha())
 				.getTreeDetail()
 				.stream().filter(t -> t.getType().equals("tree") && !t.getPath().equals(processInfo.getLoanNumber()))
 				.collect(Collectors.toList());
@@ -86,8 +105,8 @@ public class PersistenceService {
 	@SneakyThrows
 	public ProcessInfo get(String loanNumber, String sha) {
 		return objectMapper.readValue(Base64.getDecoder().decode(
-				gitClient.blob(
-								gitClient.commit(sha).getFiles().stream()
+				blob(
+								commit(sha).getFiles().stream()
 										.filter(f -> f.getFilename().equals(loanNumber.concat("/").concat("ProcessInfo.json")))
 										.findFirst().orElseThrow().getSha())
 						.getBase64content()
