@@ -20,24 +20,25 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.util.List;
+import java.util.Optional;
 
-@FeignClient(name = "gitHubClient", url = "https://api.github.com", configuration = { GitFeignConfig.class})
+@FeignClient(name = "gitHubClient", url = "https://api.github.com", configuration = { GitFeignConfig.class}, decode404 = true)
 public interface GitFeign {
 
 	@RequestMapping(method = RequestMethod.GET, value = "/repos/dmukhopadhyay1987/iwonosqldb/branches")
 	List<Branch> branches();
 
 	@RequestMapping(method = RequestMethod.GET, value = "/repos/dmukhopadhyay1987/iwonosqldb/commits/{sha}")
-	Commit commit(@PathVariable(value = "sha") String sha);
+	Optional<Commit> commit(@PathVariable(value = "sha") String sha);
 
 	@RequestMapping(method = RequestMethod.GET, value = "/repos/dmukhopadhyay1987/iwonosqldb/git/trees/{sha}")
-	Tree tree(@PathVariable(value = "sha") String sha);
+	Optional<Tree> tree(@PathVariable(value = "sha") String sha);
 
 	@RequestMapping(method = RequestMethod.GET, value = "/repos/dmukhopadhyay1987/iwonosqldb/git/blobs/{sha}")
-	Blob blob(@PathVariable(value = "sha") String sha);
+	Optional<Blob> blob(@PathVariable(value = "sha") String sha);
 
-	@RequestMapping(method = RequestMethod.GET, value = "/repos/dmukhopadhyay1987/iwonosqldb/git/ref/{ref}")
-	Reference ref(@PathVariable(value = "ref") String refName);
+	@RequestMapping(method = RequestMethod.GET, value = "/repos/dmukhopadhyay1987/iwonosqldb/git/refs/heads/{ref}")
+	Optional<Reference> ref(@PathVariable(value = "ref") String refName);
 
 	@RequestMapping(method = RequestMethod.POST, value = "/repos/dmukhopadhyay1987/iwonosqldb/git/blobs", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	Blob createBlob(@RequestBody BlobRequest blobReq);

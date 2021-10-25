@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Base64;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -46,48 +47,32 @@ public class PersistenceService {
 	@Autowired
 	private MergeRequest mergeRequest;
 
-	/*private List<Branch> branches() {
-		return gitClient.branches();
-	}*/
-
 	@Cacheable(cacheNames = "blobs", keyGenerator = "keyGen", sync = true)
 	private Blob blob(String sha) {
-		return gitClient.blob(sha);
+		return gitClient.blob(sha).orElseThrow();
 	}
 
 	@Cacheable(cacheNames = "blobs", keyGenerator = "keyGen", sync = true)
 	private Tree tree(String sha) {
-		return gitClient.tree(sha);
+		return gitClient.tree(sha).orElseThrow();
 	}
 
 	@Cacheable(cacheNames = "blobs", keyGenerator = "keyGen", sync = true)
 	private Commit commit(String sha) {
-		return gitClient.commit(sha);
+		return gitClient.commit(sha).orElseThrow();
 	}
 
 	@Cacheable(cacheNames = "refs", keyGenerator = "keyGen", sync = true)
-	private Reference ref(String sha) {
+	private Optional<Reference> ref(String sha) {
 		return gitClient.ref(sha);
 	}
 
 	public Reference branch(String branchName) {
-		Reference ref = gitClient.ref(branchName);
-		if (ref == null) {
-			ref = gitClient.createBranch(branchRequest);
-		}
-		return ref;
+		Reference main = ref("main").orElseThrow();
+		branchRequest.setSha(main.getObject().getSha());
+		branchRequest.setRef("refs/heads/" + branchName);
+		return ref(branchName).orElseGet(() -> gitClient.createBranch(branchRequest));
 	}
-
-	/*public Branch branch(String branchName) {
-		List<Branch> branches = branches();
-		if (branches.stream().noneMatch(b -> b.getName().equals(branchName))) {
-			branchRequest.setRef("refs/heads/" + branchName);
-			branchRequest.setSha(branches.stream().filter(b -> b.getName().equals("main")).findFirst().orElseThrow().getCommit().getSha());
-			gitClient.createBranch(branchRequest);
-			return branch(branchName);
-		}
-		return branches.stream().filter(b -> b.getName().equals(branchName)).findFirst().orElseThrow();
-	}*/
 
 	@SneakyThrows
 	public Commit save(ProcessInfo processInfo, String message) {
@@ -112,7 +97,7 @@ public class PersistenceService {
 		Commit commit = gitClient.createCommit(commitRequest);
 
 		branchUpdateRequest.setSha(commit.getSha());
-		gitClient.updateBranch(branch.getRef(), branchUpdateRequest);
+		gitClient.updateBranch(branch.getRef().replace("refs/heads/", ""), branchUpdateRequest);
 		return commit;
 	}
 
@@ -120,9 +105,9 @@ public class PersistenceService {
 	public ProcessInfo get(String loanNumber, String sha) {
 		return objectMapper.readValue(Base64.getDecoder().decode(
 				blob(
-								commit(sha).getFiles().stream()
-										.filter(f -> f.getFilename().equals(loanNumber.concat("/").concat("ProcessInfo.json")))
-										.findFirst().orElseThrow().getSha())
+						commit(sha).getFiles().stream()
+								.filter(f -> f.getFilename().equals(loanNumber.concat("/").concat("ProcessInfo.json")))
+								.findFirst().orElseThrow().getSha())
 						.getBase64content()
 						.replace("\n", "")
 						.replace("\r", "")), ProcessInfo.class);
