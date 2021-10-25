@@ -31,7 +31,7 @@ public class RenewalProcessEndListener implements ExecutionListener {
 		persistenceService.save(
 				processInfo,
 				delegateExecution.getProcessInstance().getProcessInstanceId());
-		persistenceService.merge(processInfo.getProcessingDate(), delegateExecution.getCurrentActivityName());
+		persistenceService.merge(processInfo.getLoanNumber(), delegateExecution.getCurrentActivityName());
 		delegateExecution.removeVariable("loanNumber");
 		delegateExecution.removeVariable("proposalResponseDto");
 		delegateExecution.removeVariable("processInfo");

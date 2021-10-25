@@ -18,8 +18,6 @@ public class ProcessInfo {
 	String loanNumber;
 	@NotNull
 	String startDateTime;
-	@NotNull
-	String processingDate;
 	LoanResponseDto loanDetails;
 	ProposalResponseDto proposalDetails;
 	String endDateTime;

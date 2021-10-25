@@ -42,7 +42,7 @@ public class PersistenceService {
 	private MergeRequest mergeRequest;
 
 	public Branch branch(String branchName) {
-		List<Branch> branches = gitClient.branches();
+		List<Branch> branches = branches();
 		if (branches.stream().noneMatch(b -> b.getName().equals(branchName))) {
 			branchRequest.setRef("refs/heads/" + branchName);
 			branchRequest.setSha(branches.stream().filter(b -> b.getName().equals("main")).findFirst().orElseThrow().getCommit().getSha());
@@ -52,13 +52,13 @@ public class PersistenceService {
 		return branches.stream().filter(b -> b.getName().equals(branchName)).findFirst().orElseThrow();
 	}
 
-	public List<Branch> branches() {
+	private List<Branch> branches() {
 		return gitClient.branches();
 	}
 
 	@SneakyThrows
 	public Commit save(ProcessInfo processInfo, String message) {
-		String branchName = processInfo.getProcessingDate();
+		String branchName = processInfo.getLoanNumber();
 		Branch branch = branch(branchName);
 		blobRequest.setContent(objectMapper.writeValueAsString(processInfo));
 		Commit lastCommit = gitClient.commit(branch.getCommit().getSha());
@@ -90,11 +90,12 @@ public class PersistenceService {
 								gitClient.commit(sha).getFiles().stream()
 										.filter(f -> f.getFilename().equals(loanNumber.concat("/").concat("ProcessInfo.json")))
 										.findFirst().orElseThrow().getSha())
-						.getBase64content().replaceAll("\n", "")
-						.replaceAll("\r", "")), ProcessInfo.class);
+						.getBase64content()
+						.replace("\n", "")
+						.replace("\r", "")), ProcessInfo.class);
 	}
 
-	public Commit merge(String branchName, String message) {
+	public void merge(String branchName, String message) {
 		List<Branch> branches = gitClient.branches();
 		String head = branches.stream()
 				.filter(b -> b.getName().equals(branchName))
@@ -108,6 +109,6 @@ public class PersistenceService {
 		mergeRequest.setBase(base);
 		mergeRequest.setHead(head);
 		mergeRequest.setCommitMessage(message);
-		return gitClient.merge(mergeRequest);
+		gitClient.merge(mergeRequest);
 	}
 }
