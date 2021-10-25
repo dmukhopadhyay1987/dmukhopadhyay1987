@@ -10,6 +10,7 @@ import com.example.feign.model.TreeRequest;
 import com.example.vo.Blob;
 import com.example.vo.Branch;
 import com.example.vo.Commit;
+import com.example.vo.Reference;
 import com.example.vo.Tree;
 import com.example.vo.TreeDetail;
 import com.example.workflow.model.ProcessInfo;
@@ -45,9 +46,9 @@ public class PersistenceService {
 	@Autowired
 	private MergeRequest mergeRequest;
 
-	private List<Branch> branches() {
+	/*private List<Branch> branches() {
 		return gitClient.branches();
-	}
+	}*/
 
 	@Cacheable(cacheNames = "blobs", keyGenerator = "keyGen", sync = true)
 	private Blob blob(String sha) {
@@ -64,7 +65,20 @@ public class PersistenceService {
 		return gitClient.commit(sha);
 	}
 
-	public Branch branch(String branchName) {
+	@Cacheable(cacheNames = "refs", keyGenerator = "keyGen", sync = true)
+	private Reference ref(String sha) {
+		return gitClient.ref(sha);
+	}
+
+	public Reference branch(String branchName) {
+		Reference ref = gitClient.ref(branchName);
+		if (ref == null) {
+			ref = gitClient.createBranch(branchRequest);
+		}
+		return ref;
+	}
+
+	/*public Branch branch(String branchName) {
 		List<Branch> branches = branches();
 		if (branches.stream().noneMatch(b -> b.getName().equals(branchName))) {
 			branchRequest.setRef("refs/heads/" + branchName);
@@ -73,14 +87,14 @@ public class PersistenceService {
 			return branch(branchName);
 		}
 		return branches.stream().filter(b -> b.getName().equals(branchName)).findFirst().orElseThrow();
-	}
+	}*/
 
 	@SneakyThrows
 	public Commit save(ProcessInfo processInfo, String message) {
 		String branchName = processInfo.getLoanNumber();
-		Branch branch = branch(branchName);
+		Reference branch = branch(branchName);
 		blobRequest.setContent(objectMapper.writeValueAsString(processInfo));
-		Commit lastCommit = commit(branch.getCommit().getSha());
+		Commit lastCommit = commit(branch.getObject().getSha());
 		List<TreeDetail> modifiedBaseTrees = tree(lastCommit.getCommitDetails().getTree().getSha())
 				.getTreeDetail()
 				.stream().filter(t -> t.getType().equals("tree") && !t.getPath().equals(processInfo.getLoanNumber()))
@@ -98,7 +112,7 @@ public class PersistenceService {
 		Commit commit = gitClient.createCommit(commitRequest);
 
 		branchUpdateRequest.setSha(commit.getSha());
-		gitClient.updateBranch(branch.getName(), branchUpdateRequest);
+		gitClient.updateBranch(branch.getRef(), branchUpdateRequest);
 		return commit;
 	}
 

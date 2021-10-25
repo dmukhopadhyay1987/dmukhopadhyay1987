@@ -36,11 +36,15 @@ public interface GitFeign {
 	@RequestMapping(method = RequestMethod.GET, value = "/repos/dmukhopadhyay1987/iwonosqldb/git/blobs/{sha}")
 	Blob blob(@PathVariable(value = "sha") String sha);
 
+	@RequestMapping(method = RequestMethod.GET, value = "/repos/dmukhopadhyay1987/iwonosqldb/git/ref/{ref}")
+	Reference ref(@PathVariable(value = "ref") String refName);
+
 	@RequestMapping(method = RequestMethod.POST, value = "/repos/dmukhopadhyay1987/iwonosqldb/git/blobs", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	Blob createBlob(@RequestBody BlobRequest blobReq);
 
 	@RequestMapping(method = RequestMethod.POST, value = "/repos/dmukhopadhyay1987/iwonosqldb/git/trees", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	Tree createTree(@RequestBody TreeRequest treeReq);
+
 	@RequestMapping(method = RequestMethod.POST, value = "/repos/dmukhopadhyay1987/iwonosqldb/git/refs", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	Reference createBranch(@RequestBody BranchRequest branchReq);
 
