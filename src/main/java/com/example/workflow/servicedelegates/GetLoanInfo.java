@@ -27,8 +27,6 @@ public class GetLoanInfo implements JavaDelegate {
 		String loanNumber = (String) delegateExecution
 				.getVariable("loanNumber");
 		LoanResponseDto loanResponseDto = loanInfoService.getLoan(loanNumber);
-//		delegateExecution.setVariable("loanResponseDto",
-//				loanResponseDto);
 		ProcessInfo processInfo = persistenceService.get(loanNumber, (String) delegateExecution.getVariable("processInfo"));
 		processInfo.setLoanDetails(loanResponseDto);
 		delegateExecution.setVariable("processInfo", persistenceService.save(

@@ -1,6 +1,5 @@
 package com.example.feign.model;
 
-import com.example.vo.Commit;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.NoArgsConstructor;

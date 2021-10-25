@@ -18,9 +18,6 @@ public class RenewalProcessEndListener implements ExecutionListener {
 	@Autowired
 	private PersistenceService persistenceService;
 
-	@Autowired
-	private ProcessInfo processInfo;
-
 	@Override
 	public void notify(DelegateExecution delegateExecution) {
 

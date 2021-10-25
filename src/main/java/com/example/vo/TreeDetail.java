@@ -4,7 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
+
+import javax.validation.constraints.NotNull;
 
 @Data
 @NoArgsConstructor
@@ -13,10 +14,10 @@ import lombok.NonNull;
 public class TreeDetail {
 
 	private String sha;
-	@NonNull
+	@NotNull
 	private String path;
-	@NonNull
+	@NotNull
 	private String type;
-	@NonNull
+	@NotNull
 	private String mode;
 }
