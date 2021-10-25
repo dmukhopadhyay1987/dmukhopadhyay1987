@@ -14,7 +14,9 @@ import com.example.vo.Reference;
 import com.example.vo.Tree;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,26 +24,27 @@ import org.springframework.web.bind.annotation.RequestBody;
 import java.util.List;
 import java.util.Optional;
 
-@FeignClient(name = "gitHubClient", url = "https://api.github.com/repos/dmukhopadhyay1987/iwonosqldb", configuration = { GitFeignConfig.class}, decode404 = true)
+@FeignClient(name = "gitHubClient",
+		url = "https://api.github.com/repos/dmukhopadhyay1987/iwonosqldb",
+		configuration = { GitFeignConfig.class},
+		decode404 = true)
 public interface GitFeign {
 
-	// GET Mappings
 	@GetMapping("/branches")
 	List<Branch> branches();
 
 	@GetMapping("/commits/{sha}")
-	Optional<Commit> commit(@PathVariable(value = "sha") String sha);
+	Optional<Commit> commit(@PathVariable("sha") String sha);
 
 	@GetMapping("/git/trees/{sha}")
-	Optional<Tree> tree(@PathVariable(value = "sha") String sha);
+	Optional<Tree> tree(@PathVariable("sha") String sha);
 
 	@GetMapping("/git/blobs/{sha}")
-	Optional<Blob> blob(@PathVariable(value = "sha") String sha);
+	Optional<Blob> blob(@PathVariable("sha") String sha);
 
 	@GetMapping("/git/refs/heads/{ref}")
-	Optional<Reference> ref(@PathVariable(value = "ref") String refName);
+	Optional<Reference> ref(@PathVariable("ref") String refName);
 
-	// POST Mappings
 	@PostMapping(value = "/git/blobs", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	Blob createBlob(@RequestBody BlobRequest blobReq);
 
@@ -51,12 +54,15 @@ public interface GitFeign {
 	@PostMapping(value = "/git/refs", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	Reference createBranch(@RequestBody BranchRequest branchReq);
 
-	@PostMapping(value = "/git/refs/heads/{branch}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	Branch updateBranch(@PathVariable(value = "branch") String branch, @RequestBody BranchUpdateRequest branchUpdateReq);
+	@PatchMapping(value = "/git/refs/heads/{branch}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	Branch updateBranch(@PathVariable("branch") String branch, @RequestBody BranchUpdateRequest branchUpdateReq);
 
 	@PostMapping(value = "/git/commits", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	Commit createCommit(@RequestBody CommitRequest commitReq);
 
 	@PostMapping(value = "/merges", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	Commit merge(@RequestBody MergeRequest mergeReq);
+
+	@DeleteMapping("/git/refs/heads/{branch}")
+	Commit deleteBranch(@PathVariable("branch") String branch);
 }

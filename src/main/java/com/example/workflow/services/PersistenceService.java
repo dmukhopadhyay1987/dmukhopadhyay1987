@@ -128,5 +128,6 @@ public class PersistenceService {
 		mergeRequest.setHead(head);
 		mergeRequest.setCommitMessage(message);
 		gitClient.merge(mergeRequest);
+		gitClient.deleteBranch(branchName);
 	}
 }
