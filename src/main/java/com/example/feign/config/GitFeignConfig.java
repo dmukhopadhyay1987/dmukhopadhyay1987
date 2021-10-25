@@ -30,7 +30,7 @@ public class GitFeignConfig {
 	public RequestInterceptor requestInterceptor() {
 		return requestTemplate -> {
 			requestTemplate.header("accept", " application/vnd.github.v3.full+json");
-			requestTemplate.header("Authorization", "Token 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");
+			requestTemplate.header("Authorization", "Token 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");
 		};
 	}
 }
