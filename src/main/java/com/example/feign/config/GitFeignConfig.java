@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import feign.RequestInterceptor;
+import feign.okhttp.OkHttpClient;
 import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,6 +14,11 @@ import org.springframework.context.annotation.Primary;
 
 @Configuration
 public class GitFeignConfig {
+
+	@Bean
+	public OkHttpClient client() {
+		return new OkHttpClient();
+	}
 
 	@Bean
 	@Primary
