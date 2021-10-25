@@ -16,7 +16,7 @@ import java.time.format.DateTimeFormatter;
 public class RenewalProcessStartListener implements ExecutionListener {
 
 	@Autowired
-	private PersistenceService persistenceService;
+	private PersistenceService<ProcessInfo> persistenceService;
 
 	@Autowired
 	private ProcessInfo processInfo;
@@ -30,6 +30,8 @@ public class RenewalProcessStartListener implements ExecutionListener {
 		processInfo.setStartDateTime(LocalDateTime.now().format(
 				DateTimeFormatter.ISO_DATE_TIME));
 		delegateExecution.setVariable("processInfo", persistenceService.save(
+				processInfo.getLoanNumber(),
+				processInfo.getLoanNumber(),
 				processInfo,
 				delegateExecution.getCurrentActivityName()).getSha());
 	}

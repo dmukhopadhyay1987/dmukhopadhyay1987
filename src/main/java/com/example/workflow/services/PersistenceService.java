@@ -13,7 +13,6 @@ import com.example.vo.Commit;
 import com.example.vo.Reference;
 import com.example.vo.Tree;
 import com.example.vo.TreeDetail;
-import com.example.workflow.model.ProcessInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,12 +22,13 @@ import org.springframework.stereotype.Service;
 
 import java.util.Base64;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @EnableCaching
-public class PersistenceService {
+public class PersistenceService<T> {
 
 	@Autowired
 	private GitFeign gitClient;
@@ -75,17 +75,16 @@ public class PersistenceService {
 	}
 
 	@SneakyThrows
-	public Commit save(ProcessInfo processInfo, String message) {
-		String branchName = processInfo.getLoanNumber();
+	public Commit save(String branchName, String path, T payload, String message) {
 		Reference branch = branch(branchName);
-		blobRequest.setContent(objectMapper.writeValueAsString(processInfo));
+		blobRequest.setContent(objectMapper.writeValueAsString(payload));
 		Commit lastCommit = commit(branch.getObject().getSha());
 		List<TreeDetail> modifiedBaseTrees = tree(lastCommit.getCommitDetails().getTree().getSha())
 				.getTreeDetail()
-				.stream().filter(t -> t.getType().equals("tree") && !t.getPath().equals(processInfo.getLoanNumber()))
+				.stream().filter(t -> t.getType().equals("tree") && !t.getPath().equals(path))
 				.collect(Collectors.toList());
 		modifiedBaseTrees.add(new TreeDetail(gitClient.createBlob(blobRequest).getSha(),
-				processInfo.getLoanNumber().concat("/").concat(processInfo.getClass().getSimpleName().concat(".json")),
+				path.concat("/").concat(payload.getClass().getSimpleName().toLowerCase(Locale.ROOT).concat(".json")),
 				"blob",
 				"100644"));
 		treeRequest.setTree(modifiedBaseTrees);
@@ -102,15 +101,15 @@ public class PersistenceService {
 	}
 
 	@SneakyThrows
-	public ProcessInfo get(String loanNumber, String sha) {
+	public T get(String path, String sha, Class<T> c) {
 		return objectMapper.readValue(Base64.getDecoder().decode(
 				blob(
 						commit(sha).getFiles().stream()
-								.filter(f -> f.getFilename().equals(loanNumber.concat("/").concat("ProcessInfo.json")))
+								.filter(f -> f.getFilename().equals(path.concat("/").concat(c.getSimpleName().toLowerCase(Locale.ROOT).concat(".json"))))
 								.findFirst().orElseThrow().getSha())
 						.getBase64content()
 						.replace("\n", "")
-						.replace("\r", "")), ProcessInfo.class);
+						.replace("\r", "")), c);
 	}
 
 	public void merge(String branchName, String message) {

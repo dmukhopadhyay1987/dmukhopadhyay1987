@@ -16,7 +16,7 @@ import java.time.format.DateTimeFormatter;
 public class RenewalProcessEndListener implements ExecutionListener {
 
 	@Autowired
-	private PersistenceService persistenceService;
+	private PersistenceService<ProcessInfo> persistenceService;
 
 	@Override
 	public void notify(DelegateExecution delegateExecution) {
@@ -25,10 +25,12 @@ public class RenewalProcessEndListener implements ExecutionListener {
 				delegateExecution.getCurrentActivityName());
 		String loanNumber = (String) delegateExecution
 				.getVariable("loanNumber");
-		ProcessInfo processInfo = persistenceService.get(loanNumber, (String) delegateExecution.getVariable("processInfo"));
+		ProcessInfo processInfo = persistenceService.get(loanNumber, (String) delegateExecution.getVariable("processInfo"), ProcessInfo.class);
 		processInfo.setEndDateTime(LocalDateTime.now().format(
 				DateTimeFormatter.ISO_DATE_TIME));
 		persistenceService.save(
+				processInfo.getLoanNumber(),
+				processInfo.getLoanNumber(),
 				processInfo,
 				delegateExecution.getProcessInstance().getProcessInstanceId());
 		persistenceService.merge(processInfo.getLoanNumber(), delegateExecution.getCurrentActivityName());

@@ -19,7 +19,7 @@ public class GetProposalInfo implements JavaDelegate {
 	ProposalInfoService proposalInfoService;
 
 	@Autowired
-	PersistenceService persistenceService;
+	PersistenceService<ProcessInfo> persistenceService;
 
 	@Override
 	public void execute(DelegateExecution delegateExecution) {
@@ -31,9 +31,11 @@ public class GetProposalInfo implements JavaDelegate {
 				.getVariable("proposalRequestDto"));
 		delegateExecution.setVariable("proposalResponseDto",
 				proposalResponseDto);
-		ProcessInfo processInfo = persistenceService.get(loanNumber, (String) delegateExecution.getVariable("processInfo"));
+		ProcessInfo processInfo = persistenceService.get(loanNumber, (String) delegateExecution.getVariable("processInfo"), ProcessInfo.class);
 		processInfo.setProposalDetails(proposalResponseDto);
 		delegateExecution.setVariable("processInfo", persistenceService.save(
+				processInfo.getLoanNumber(),
+				processInfo.getLoanNumber(),
 				processInfo,
 				delegateExecution.getCurrentActivityName()).getSha());
 		delegateExecution.removeVariable("proposalRequestDto");

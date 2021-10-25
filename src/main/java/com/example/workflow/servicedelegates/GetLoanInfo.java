@@ -18,7 +18,7 @@ public class GetLoanInfo implements JavaDelegate {
 	LoanInfoService loanInfoService;
 
 	@Autowired
-	PersistenceService persistenceService;
+	PersistenceService<ProcessInfo> persistenceService;
 
 	@Override
 	public void execute(DelegateExecution delegateExecution) {
@@ -27,9 +27,11 @@ public class GetLoanInfo implements JavaDelegate {
 		String loanNumber = (String) delegateExecution
 				.getVariable("loanNumber");
 		LoanResponseDto loanResponseDto = loanInfoService.getLoan(loanNumber);
-		ProcessInfo processInfo = persistenceService.get(loanNumber, (String) delegateExecution.getVariable("processInfo"));
+		ProcessInfo processInfo = persistenceService.get(loanNumber, (String) delegateExecution.getVariable("processInfo"), ProcessInfo.class);
 		processInfo.setLoanDetails(loanResponseDto);
 		delegateExecution.setVariable("processInfo", persistenceService.save(
+				processInfo.getLoanNumber(),
+				processInfo.getLoanNumber(),
 				processInfo,
 				delegateExecution.getCurrentActivityName()).getSha());
 	}
