@@ -36,7 +36,7 @@ public class RenewalProcessEndListener implements ExecutionListener {
 				processInfo.getLoanNumber(),
 				filePathService.getQualifiedFilePath(processInfo.getLoanNumber(), ProcessInfo.class),
 				processInfo,
-				this.getClass().getSimpleName());
+				delegateExecution.getCurrentActivityName());
 		persistenceService.merge(processInfo.getLoanNumber(), delegateExecution.getCurrentActivityName());
 		delegateExecution.removeVariable("loanNumber");
 		delegateExecution.removeVariable("proposalResponseDto");

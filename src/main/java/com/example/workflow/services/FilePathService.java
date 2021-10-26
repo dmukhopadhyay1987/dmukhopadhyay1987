@@ -7,13 +7,13 @@ import java.util.Locale;
 @Service
 public class FilePathService {
 
-	public String getQualifiedFilePath(String path, Class c) {
+	public String getQualifiedFilePath(String path, Class<?> c) {
 		return path.concat("/")
 				.concat(getFileNameInRepo(c).toLowerCase(Locale.ROOT)
 						.concat(".json"));
 	}
 
-	private String getFileNameInRepo(Class obj) {
+	private String getFileNameInRepo(Class<?> obj) {
 		return obj.getSimpleName();
 	}
 }
