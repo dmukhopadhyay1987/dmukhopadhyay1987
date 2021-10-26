@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Locale;
 
 @Component
 @Slf4j
@@ -38,9 +37,14 @@ public class RenewalProcessEndListener implements ExecutionListener {
 				filePathService.getQualifiedFilePath(processInfo.getLoanNumber(), ProcessInfo.class),
 				processInfo,
 				this.getClass().getSimpleName());
-		persistenceService.merge(processInfo.getLoanNumber(), this.getClass().getSimpleName().toLowerCase(Locale.ROOT));
+		persistenceService.merge(processInfo.getLoanNumber(), delegateExecution.getCurrentActivityName());
 		delegateExecution.removeVariable("loanNumber");
 		delegateExecution.removeVariable("proposalResponseDto");
 		delegateExecution.removeVariable("processInfo");
+		persistenceService.history(filePathService.getQualifiedFilePath(processInfo.getLoanNumber(), ProcessInfo.class))
+				.forEach(c -> {
+					log.info("Commit {} at {} :: '{}'", c.getSha(), c.getCommitDetails().getCommitter().getDate(), c.getCommitDetails().getMessage());
+					c.getFiles().forEach(f -> log.info("{} >>> ADDED [{}] MODIFIED [{}] DELETED [{}]", f.getStatus(), f.getAdditions(), f.getChanges(), f.getDeletions()));
+				});
 	}
 }

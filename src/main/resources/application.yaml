@@ -23,5 +23,5 @@ spring:
     password: Pass@2021
 
 
-logging.level.com.example.feign.GitFeign: DEBUG
-feign.client.config.default.loggerLevel: full
+#logging.level.com.example.feign.GitFeign: DEBUG
+#feign.client.config.default.loggerLevel: full

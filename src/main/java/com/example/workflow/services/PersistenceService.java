@@ -9,23 +9,29 @@ import com.example.feign.model.MergeRequest;
 import com.example.feign.model.TreeRequest;
 import com.example.vo.Blob;
 import com.example.vo.Commit;
-import com.example.vo.File;
 import com.example.vo.Reference;
 import com.example.vo.Tree;
 import com.example.vo.TreeDetail;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Base64;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 @EnableCaching
 public class PersistenceService<T> {
 
@@ -46,27 +52,32 @@ public class PersistenceService<T> {
 	@Autowired
 	private MergeRequest mergeRequest;
 
-	@Cacheable(cacheNames = "blobs", keyGenerator = "keyGen", sync = true)
+	@Cacheable(cacheNames = "blobs", keyGenerator = "keyGen")
 	private Blob blob(String sha) {
+		log.info("GET blob {}", sha);
 		return gitClient.blob(sha).orElseThrow();
 	}
 
-	@Cacheable(cacheNames = "blobs", keyGenerator = "keyGen", sync = true)
+	@Cacheable(cacheNames = "tree", keyGenerator = "keyGen")
 	private Tree tree(String sha) {
+		log.info("GET tree {}", sha);
 		return gitClient.tree(sha).orElseThrow();
 	}
 
-	@Cacheable(cacheNames = "blobs", keyGenerator = "keyGen", sync = true)
+	@Cacheable(cacheNames = "commits", keyGenerator = "keyGen")
 	private Commit commit(String sha) {
+		log.info("GET commit {}", sha);
 		return gitClient.commit(sha).orElseThrow();
 	}
 
-	@Cacheable(cacheNames = "refs", keyGenerator = "keyGen", sync = true)
+	@Cacheable(cacheNames = "refs", keyGenerator = "keyGen")
 	private Optional<Reference> ref(String ref) {
+		log.info("GET ref {}", ref);
 		return gitClient.ref(ref);
 	}
 
 	private Reference branch(String branchName) {
+		log.info("GET / POST branch {}", branchName);
 		Reference main = ref("main").orElseThrow();
 		branchRequest.setSha(main.getObject().getSha());
 		branchRequest.setRef("refs/heads/" + branchName);
@@ -75,6 +86,7 @@ public class PersistenceService<T> {
 
 	@SneakyThrows
 	public Commit save(String branchName, String path, T payload, String message) {
+		log.info("POST '{}' into '{}' for task: '{}'", path, branchName, message);
 		Reference branch = branch(branchName);
 		blobRequest.setContent(objectMapper.writeValueAsString(payload));
 		Commit lastCommit = commit(branch.getObject().getSha());
@@ -101,14 +113,16 @@ public class PersistenceService<T> {
 
 	@SneakyThrows
 	public T get(String path, String sha, Class<T> c) {
-		return objectMapper.readValue(Base64.getDecoder().decode(
-				blob(
-						commit(sha).getFiles().stream()
-								.filter(f -> f.getFilename().equals(path))
-								.findFirst().orElseThrow().getSha())
-						.getBase64content()
-						.replace("\n", "")
-						.replace("\r", "")), c);
+		log.info("GET blob content of '{}' and cast to {}", path, c.getSimpleName());
+		return objectMapper.readValue(Base64.getDecoder().decode(tree(commit(sha).getCommitDetails().getTree().getSha())
+				.getTreeDetail().stream()
+				.filter(t -> path.contains(t.getPath()))
+				.map(td -> tree(td.getSha()))
+				.map(bt -> blob(bt.getTreeDetail().stream().findFirst().orElseThrow().getSha()))
+				.findFirst().orElseThrow()
+				.getBase64content()
+				.replace("\n", "")
+				.replace("\r", "")), c);
 	}
 
 	public void merge(String branchName, String message) {
@@ -122,27 +136,38 @@ public class PersistenceService<T> {
 		gitClient.deleteBranch(branchName);
 	}
 
-	public List<File> history(String path) {
-		List<Commit> commitChain = chain(commit(ref("main").orElseThrow()
-				.getObject()
-				.getSha()), null);
-		return commitChain.stream()
-				.map(c -> c.getFiles()
-						.stream().filter(f -> f.getFilename().equals(path))
-						.findFirst().orElseThrow())
-				.collect(Collectors.toList());
+	public List<Commit> history(String path) {
+		log.info("GET commits '{}'", path);
+		return chain(path,
+				commit(ref("main").orElseThrow()
+						.getObject()
+						.getSha()), null);
 	}
 
-	public List<Commit> chain(Commit head, List<Commit> list) {
-		if (list == null) {
-			list = List.of(head);
+	private List<Commit> chain(String path, Commit head, final List<Commit> list) {
+		List<Commit> localList = new CopyOnWriteArrayList<>(
+				Objects.requireNonNullElseGet(
+						list,
+						() -> !head.getCommitDetails().getMessage().contains("Merge") ? List.of(head) : List.of()));
+		List<Commit> parents = commit(head.getSha()).getParents();
+		Commit parent = parents.stream()
+				.map(p -> commit(p.getSha()))
+				.max(Comparator.comparing(
+						a -> LocalDateTime.parse(
+								a.getCommitDetails().getCommitter().getDate(),
+								DateTimeFormatter.ISO_DATE_TIME)))
+				.orElse(null);
+		if (parent != null && tree(
+				parent.getCommitDetails().getTree().getSha())
+				.getTreeDetail()
+				.stream().anyMatch(
+						t -> t.getType().equals("tree")
+								&& path.contains(t.getPath()))) {
+			if (!parent.getCommitDetails()
+					.getMessage()
+					.contains("Merge")) localList.add(parent);
+			return chain(path, commit(parent.getSha()), localList);
 		}
-		List<Commit> parents = head.getParents();
-		for (Commit p: parents) {
-			Commit parentCommit = commit(p.getSha());
-			list.add(parentCommit);
-			return chain(parentCommit, list);
-		}
-		return list;
+		return localList;
 	}
 }

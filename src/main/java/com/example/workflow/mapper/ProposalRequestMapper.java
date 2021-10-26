@@ -29,11 +29,12 @@ public class ProposalRequestMapper implements JavaDelegate {
 	public void execute(DelegateExecution delegateExecution) {
 		log.info("Inside >>> {}",
 				delegateExecution.getCurrentActivityName());
-		delegateExecution.getVariables().forEach((k, v) -> log.info("Variables >>> {} :: {}", k, v));
 		String loanNumber = (String) delegateExecution.getVariable("loanNumber");
-		LoanResponseDto loanResponseDto = persistenceService.get(filePathService.getQualifiedFilePath(loanNumber, ProcessInfo.class), (String) delegateExecution.getVariable("processInfo"), ProcessInfo.class).getLoanDetails();
+		LoanResponseDto loanResponseDto = persistenceService.get(
+				filePathService.getQualifiedFilePath(loanNumber, ProcessInfo.class),
+				(String) delegateExecution.getVariable("processInfo"),
+				ProcessInfo.class).getLoanDetails();
 		ProposalRequestDto proposalRequestDto = dozerBeanMapper.map(loanResponseDto, ProposalRequestDto.class);
 		delegateExecution.setVariable("proposalRequestDto", proposalRequestDto);
-		delegateExecution.getVariables().forEach((k, v) -> log.info("Variables >>> {} :: {}", k, v));
 	}
 }
