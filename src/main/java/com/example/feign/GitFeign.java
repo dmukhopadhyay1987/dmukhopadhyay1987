@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import java.util.List;
 import java.util.Optional;
 
 @FeignClient(name = "gitHubClient",
@@ -29,9 +28,6 @@ import java.util.Optional;
 		configuration = { GitFeignConfig.class},
 		decode404 = true)
 public interface GitFeign {
-
-	@GetMapping("/branches")
-	List<Branch> branches();
 
 	@GetMapping("/commits/{sha}")
 	Optional<Commit> commit(@PathVariable("sha") String sha);

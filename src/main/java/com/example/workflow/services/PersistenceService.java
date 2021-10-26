@@ -8,8 +8,8 @@ import com.example.feign.model.CommitRequest;
 import com.example.feign.model.MergeRequest;
 import com.example.feign.model.TreeRequest;
 import com.example.vo.Blob;
-import com.example.vo.Branch;
 import com.example.vo.Commit;
+import com.example.vo.File;
 import com.example.vo.Reference;
 import com.example.vo.Tree;
 import com.example.vo.TreeDetail;
@@ -22,7 +22,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Base64;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -63,11 +62,11 @@ public class PersistenceService<T> {
 	}
 
 	@Cacheable(cacheNames = "refs", keyGenerator = "keyGen", sync = true)
-	private Optional<Reference> ref(String sha) {
-		return gitClient.ref(sha);
+	private Optional<Reference> ref(String ref) {
+		return gitClient.ref(ref);
 	}
 
-	public Reference branch(String branchName) {
+	private Reference branch(String branchName) {
 		Reference main = ref("main").orElseThrow();
 		branchRequest.setSha(main.getObject().getSha());
 		branchRequest.setRef("refs/heads/" + branchName);
@@ -81,10 +80,10 @@ public class PersistenceService<T> {
 		Commit lastCommit = commit(branch.getObject().getSha());
 		List<TreeDetail> modifiedBaseTrees = tree(lastCommit.getCommitDetails().getTree().getSha())
 				.getTreeDetail()
-				.stream().filter(t -> t.getType().equals("tree") && !t.getPath().equals(path))
+				.stream().filter(t -> t.getType().equals("tree") && !path.contains(t.getPath()))
 				.collect(Collectors.toList());
 		modifiedBaseTrees.add(new TreeDetail(gitClient.createBlob(blobRequest).getSha(),
-				path.concat("/").concat(payload.getClass().getSimpleName().toLowerCase(Locale.ROOT).concat(".json")),
+				path,
 				"blob",
 				"100644"));
 		treeRequest.setTree(modifiedBaseTrees);
@@ -105,7 +104,7 @@ public class PersistenceService<T> {
 		return objectMapper.readValue(Base64.getDecoder().decode(
 				blob(
 						commit(sha).getFiles().stream()
-								.filter(f -> f.getFilename().equals(path.concat("/").concat(c.getSimpleName().toLowerCase(Locale.ROOT).concat(".json"))))
+								.filter(f -> f.getFilename().equals(path))
 								.findFirst().orElseThrow().getSha())
 						.getBase64content()
 						.replace("\n", "")
@@ -113,20 +112,37 @@ public class PersistenceService<T> {
 	}
 
 	public void merge(String branchName, String message) {
-		List<Branch> branches = gitClient.branches();
-		String head = branches.stream()
-				.filter(b -> b.getName().equals(branchName))
-				.findFirst().orElseThrow()
-				.getCommit()
+		String head = ref(branchName).orElseThrow()
+				.getObject()
 				.getSha();
-		String base = branches.stream()
-				.filter(b -> b.getName().equals("main"))
-				.findFirst().orElseThrow()
-				.getName();
-		mergeRequest.setBase(base);
+		mergeRequest.setBase("main");
 		mergeRequest.setHead(head);
 		mergeRequest.setCommitMessage(message);
 		gitClient.merge(mergeRequest);
 		gitClient.deleteBranch(branchName);
+	}
+
+	public List<File> history(String path) {
+		List<Commit> commitChain = chain(commit(ref("main").orElseThrow()
+				.getObject()
+				.getSha()), null);
+		return commitChain.stream()
+				.map(c -> c.getFiles()
+						.stream().filter(f -> f.getFilename().equals(path))
+						.findFirst().orElseThrow())
+				.collect(Collectors.toList());
+	}
+
+	public List<Commit> chain(Commit head, List<Commit> list) {
+		if (list == null) {
+			list = List.of(head);
+		}
+		List<Commit> parents = head.getParents();
+		for (Commit p: parents) {
+			Commit parentCommit = commit(p.getSha());
+			list.add(parentCommit);
+			return chain(parentCommit, list);
+		}
+		return list;
 	}
 }

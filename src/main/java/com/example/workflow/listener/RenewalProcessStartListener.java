@@ -1,6 +1,7 @@
 package com.example.workflow.listener;
 
 import com.example.workflow.model.ProcessInfo;
+import com.example.workflow.services.FilePathService;
 import com.example.workflow.services.PersistenceService;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -21,6 +22,9 @@ public class RenewalProcessStartListener implements ExecutionListener {
 	@Autowired
 	private ProcessInfo processInfo;
 
+	@Autowired
+	FilePathService filePathService;
+
 	@Override
 	public void notify(DelegateExecution delegateExecution) {
 
@@ -31,7 +35,7 @@ public class RenewalProcessStartListener implements ExecutionListener {
 				DateTimeFormatter.ISO_DATE_TIME));
 		delegateExecution.setVariable("processInfo", persistenceService.save(
 				processInfo.getLoanNumber(),
-				processInfo.getLoanNumber(),
+				filePathService.getQualifiedFilePath(processInfo.getLoanNumber(), ProcessInfo.class),
 				processInfo,
 				delegateExecution.getCurrentActivityName()).getSha());
 	}
