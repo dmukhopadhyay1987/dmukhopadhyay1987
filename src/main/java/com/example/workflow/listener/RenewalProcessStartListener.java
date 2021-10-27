@@ -1,7 +1,7 @@
 package com.example.workflow.listener;
 
 import com.example.workflow.model.ProcessInfo;
-import com.example.workflow.services.FilePathService;
+import com.example.workflow.services.GenericUtilityService;
 import com.example.workflow.services.PersistenceService;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -23,20 +23,22 @@ public class RenewalProcessStartListener implements ExecutionListener {
 	private ProcessInfo processInfo;
 
 	@Autowired
-	FilePathService filePathService;
+	GenericUtilityService genericUtilityService;
 
 	@Override
 	public void notify(DelegateExecution delegateExecution) {
-
 		log.info("Inside >>> {}",
 				delegateExecution.getCurrentActivityName());
-		processInfo.setLoanNumber((String) delegateExecution.getVariable("loanNumber"));
+		String loanNumber = (String) delegateExecution.getVariable("loanNumber");
+		processInfo.setLoanNumber(loanNumber);
 		processInfo.setStartDateTime(LocalDateTime.now().format(
 				DateTimeFormatter.ISO_DATE_TIME));
-		delegateExecution.setVariable("processInfo", persistenceService.save(
-				processInfo.getLoanNumber(),
-				filePathService.getQualifiedFilePath(processInfo.getLoanNumber(), ProcessInfo.class),
-				processInfo,
-				delegateExecution.getCurrentActivityName()).getSha());
+		genericUtilityService.setBusinessKey(delegateExecution,
+				loanNumber,
+				persistenceService.save(
+						processInfo.getLoanNumber(),
+						genericUtilityService.getQualifiedFilePath(processInfo.getLoanNumber(), ProcessInfo.class),
+						processInfo,
+						delegateExecution.getCurrentActivityName()).getSha());
 	}
 }

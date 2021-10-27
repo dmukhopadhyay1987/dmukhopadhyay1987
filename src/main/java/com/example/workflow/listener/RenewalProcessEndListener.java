@@ -1,7 +1,7 @@
 package com.example.workflow.listener;
 
 import com.example.workflow.model.ProcessInfo;
-import com.example.workflow.services.FilePathService;
+import com.example.workflow.services.GenericUtilityService;
 import com.example.workflow.services.PersistenceService;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -20,28 +20,30 @@ public class RenewalProcessEndListener implements ExecutionListener {
 	PersistenceService<ProcessInfo> persistenceService;
 
 	@Autowired
-	FilePathService filePathService;
+	GenericUtilityService genericUtilityService;
 
 	@Override
 	public void notify(DelegateExecution delegateExecution) {
 
 		log.info("Inside >>> {}",
 				delegateExecution.getCurrentActivityName());
-		String loanNumber = (String) delegateExecution
-				.getVariable("loanNumber");
-		ProcessInfo processInfo = persistenceService.get(filePathService.getQualifiedFilePath(loanNumber, ProcessInfo.class), (String) delegateExecution.getVariable("processInfo"), ProcessInfo.class);
+		String loanNumber = genericUtilityService.loanNumber(delegateExecution);
+		ProcessInfo processInfo = persistenceService.get(genericUtilityService.getQualifiedFilePath(loanNumber, ProcessInfo.class),
+				genericUtilityService.processInfoSha(delegateExecution),
+				ProcessInfo.class);
 		processInfo.setEndDateTime(LocalDateTime.now().format(
 				DateTimeFormatter.ISO_DATE_TIME));
 		persistenceService.save(
 				processInfo.getLoanNumber(),
-				filePathService.getQualifiedFilePath(processInfo.getLoanNumber(), ProcessInfo.class),
+				genericUtilityService.getQualifiedFilePath(processInfo.getLoanNumber(), ProcessInfo.class),
 				processInfo,
 				delegateExecution.getCurrentActivityName());
 		persistenceService.merge(processInfo.getLoanNumber(), delegateExecution.getCurrentActivityName());
 		delegateExecution.removeVariable("loanNumber");
 		delegateExecution.removeVariable("proposalResponseDto");
 		delegateExecution.removeVariable("processInfo");
-		persistenceService.history(filePathService.getQualifiedFilePath(processInfo.getLoanNumber(), ProcessInfo.class))
+		persistenceService.history(genericUtilityService.getQualifiedFilePath(processInfo.getLoanNumber(), ProcessInfo.class))
+				.stream().filter(commit -> !commit.getFiles().isEmpty())
 				.forEach(c -> {
 					log.info("Commit {} at {} :: '{}'", c.getSha(), c.getCommitDetails().getCommitter().getDate(), c.getCommitDetails().getMessage());
 					c.getFiles().forEach(f -> log.info("{} >>> ADDED [{}] MODIFIED [{}] DELETED [{}]", f.getStatus(), f.getAdditions(), f.getChanges(), f.getDeletions()));

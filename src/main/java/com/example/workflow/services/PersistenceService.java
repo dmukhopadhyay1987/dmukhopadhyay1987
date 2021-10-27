@@ -54,30 +54,30 @@ public class PersistenceService<T> {
 
 	@Cacheable(cacheNames = "blobs", keyGenerator = "keyGen")
 	private Blob blob(String sha) {
-		log.info("GET blob {}", sha);
+		log.debug("GET blob {}", sha);
 		return gitClient.blob(sha).orElseThrow();
 	}
 
 	@Cacheable(cacheNames = "tree", keyGenerator = "keyGen")
 	private Tree tree(String sha) {
-		log.info("GET tree {}", sha);
+		log.debug("GET tree {}", sha);
 		return gitClient.tree(sha).orElseThrow();
 	}
 
 	@Cacheable(cacheNames = "commits", keyGenerator = "keyGen")
 	private Commit commit(String sha) {
-		log.info("GET commit {}", sha);
+		log.debug("GET commit {}", sha);
 		return gitClient.commit(sha).orElseThrow();
 	}
 
 	@Cacheable(cacheNames = "refs", keyGenerator = "keyGen")
 	private Optional<Reference> ref(String ref) {
-		log.info("GET ref {}", ref);
+		log.debug("GET ref {}", ref);
 		return gitClient.ref(ref);
 	}
 
 	private Reference branch(String branchName) {
-		log.info("GET / POST branch {}", branchName);
+		log.info("Obtaining branch {}", branchName);
 		Reference main = ref("main").orElseThrow();
 		branchRequest.setSha(main.getObject().getSha());
 		branchRequest.setRef("refs/heads/" + branchName);
@@ -113,7 +113,7 @@ public class PersistenceService<T> {
 
 	@SneakyThrows
 	public T get(String path, String sha, Class<T> c) {
-		log.info("GET blob content of '{}' and cast to {}", path, c.getSimpleName());
+		log.info("GET content of '{}' and cast to {}", path, c.getSimpleName());
 		return objectMapper.readValue(Base64.getDecoder().decode(tree(commit(sha).getCommitDetails().getTree().getSha())
 				.getTreeDetail().stream()
 				.filter(t -> path.contains(t.getPath()))

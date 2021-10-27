@@ -2,7 +2,7 @@ package com.example.workflow.servicedelegates;
 
 import com.example.workflow.model.LoanResponseDto;
 import com.example.workflow.model.ProcessInfo;
-import com.example.workflow.services.FilePathService;
+import com.example.workflow.services.GenericUtilityService;
 import com.example.workflow.services.LoanInfoService;
 import com.example.workflow.services.PersistenceService;
 import lombok.extern.slf4j.Slf4j;
@@ -22,21 +22,27 @@ public class GetLoanInfo implements JavaDelegate {
 	PersistenceService<ProcessInfo> persistenceService;
 
 	@Autowired
-	FilePathService filePathService;
+	GenericUtilityService genericUtilityService;
 
 	@Override
 	public void execute(DelegateExecution delegateExecution) {
 		log.info("Inside >>> {}",
 				delegateExecution.getCurrentActivityName());
-		String loanNumber = (String) delegateExecution
-				.getVariable("loanNumber");
+		String loanNumber = genericUtilityService.loanNumber(delegateExecution);
 		LoanResponseDto loanResponseDto = loanInfoService.getLoan(loanNumber);
-		ProcessInfo processInfo = persistenceService.get(filePathService.getQualifiedFilePath(loanNumber, ProcessInfo.class), (String) delegateExecution.getVariable("processInfo"), ProcessInfo.class);
+		ProcessInfo processInfo = persistenceService.get(
+				genericUtilityService.getQualifiedFilePath(
+						loanNumber,
+						ProcessInfo.class),
+				genericUtilityService.processInfoSha(delegateExecution),
+				ProcessInfo.class);
 		processInfo.setLoanDetails(loanResponseDto);
-		delegateExecution.setVariable("processInfo", persistenceService.save(
-				processInfo.getLoanNumber(),
-				filePathService.getQualifiedFilePath(processInfo.getLoanNumber(), ProcessInfo.class),
-				processInfo,
-				delegateExecution.getCurrentActivityName()).getSha());
+		genericUtilityService.setBusinessKey(delegateExecution,
+				loanNumber,
+				persistenceService.save(
+						processInfo.getLoanNumber(),
+						genericUtilityService.getQualifiedFilePath(processInfo.getLoanNumber(), ProcessInfo.class),
+						processInfo,
+						delegateExecution.getCurrentActivityName()).getSha());
 	}
 }
