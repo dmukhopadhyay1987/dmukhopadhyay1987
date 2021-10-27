@@ -25,6 +25,12 @@ public class GetProposalInfo implements JavaDelegate {
 	@Autowired
 	GenericUtilityService genericUtilityService;
 
+	@Autowired
+	String proposalRequestVariableKey;
+
+	@Autowired
+	String proposalResponseVariableKey;
+
 	@Override
 	public void execute(DelegateExecution delegateExecution) {
 		log.info("Inside >>> {}",
@@ -32,8 +38,8 @@ public class GetProposalInfo implements JavaDelegate {
 		String loanNumber = genericUtilityService.loanNumber(delegateExecution);
 		ProposalResponseDto proposalResponseDto = proposalInfoService.getProposal(
 				(ProposalRequestDto) delegateExecution
-						.getVariable("proposalRequestDto"));
-		delegateExecution.setVariable("proposalResponseDto",
+						.getVariable(proposalRequestVariableKey));
+		delegateExecution.setVariable(proposalResponseVariableKey,
 				proposalResponseDto);
 		ProcessInfo processInfo = persistenceService.get(genericUtilityService.getQualifiedFilePath(
 						loanNumber,
@@ -47,7 +53,7 @@ public class GetProposalInfo implements JavaDelegate {
 				processInfo.getLoanNumber(),
 				genericUtilityService.getQualifiedFilePath(processInfo.getLoanNumber(), ProcessInfo.class),
 				processInfo,
-				delegateExecution.getCurrentActivityName()).getSha());
-		delegateExecution.removeVariable("proposalRequestDto");
+				genericUtilityService.commitMessage(delegateExecution, false)).getSha());
+		delegateExecution.removeVariable(proposalRequestVariableKey);
 	}
 }

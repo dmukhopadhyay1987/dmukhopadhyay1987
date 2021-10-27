@@ -1,6 +1,7 @@
 package com.example.feign.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -17,5 +18,6 @@ public class MergeRequest {
 	String base;
 	@NotNull
 	String head;
+	@JsonProperty("commit_message")
 	String commitMessage;
 }

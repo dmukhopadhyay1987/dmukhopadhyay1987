@@ -25,6 +25,9 @@ public class ProposalRequestMapper implements JavaDelegate {
 	@Autowired
 	GenericUtilityService genericUtilityService;
 
+	@Autowired
+	String proposalRequestVariableKey;
+
 	@Override
 	public void execute(DelegateExecution delegateExecution) {
 		log.info("Inside >>> {}",
@@ -35,6 +38,6 @@ public class ProposalRequestMapper implements JavaDelegate {
 				genericUtilityService.processInfoSha(delegateExecution),
 				ProcessInfo.class).getLoanDetails();
 		ProposalRequestDto proposalRequestDto = dozerBeanMapper.map(loanResponseDto, ProposalRequestDto.class);
-		delegateExecution.setVariable("proposalRequestDto", proposalRequestDto);
+		delegateExecution.setVariable(proposalRequestVariableKey, proposalRequestDto);
 	}
 }

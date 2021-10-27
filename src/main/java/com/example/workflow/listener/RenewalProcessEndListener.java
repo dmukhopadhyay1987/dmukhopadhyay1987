@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -21,6 +22,12 @@ public class RenewalProcessEndListener implements ExecutionListener {
 
 	@Autowired
 	GenericUtilityService genericUtilityService;
+
+	@Autowired
+	String loanVariableKey;
+
+	@Autowired
+	String proposalResponseVariableKey;
 
 	@Override
 	public void notify(DelegateExecution delegateExecution) {
@@ -37,13 +44,13 @@ public class RenewalProcessEndListener implements ExecutionListener {
 				processInfo.getLoanNumber(),
 				genericUtilityService.getQualifiedFilePath(processInfo.getLoanNumber(), ProcessInfo.class),
 				processInfo,
-				delegateExecution.getCurrentActivityName());
-		persistenceService.merge(processInfo.getLoanNumber(), delegateExecution.getCurrentActivityName());
-		delegateExecution.removeVariable("loanNumber");
-		delegateExecution.removeVariable("proposalResponseDto");
-		delegateExecution.removeVariable("processInfo");
+				genericUtilityService.commitMessage(delegateExecution, false));
+		persistenceService.merge(processInfo.getLoanNumber(), genericUtilityService.commitMessage(delegateExecution, true));
+		delegateExecution.removeVariable(loanVariableKey);
+		delegateExecution.removeVariable(proposalResponseVariableKey);
 		persistenceService.history(genericUtilityService.getQualifiedFilePath(processInfo.getLoanNumber(), ProcessInfo.class))
 				.stream().filter(commit -> !commit.getFiles().isEmpty())
+				.collect(Collectors.toList())
 				.forEach(c -> {
 					log.info("Commit {} at {} :: '{}'", c.getSha(), c.getCommitDetails().getCommitter().getDate(), c.getCommitDetails().getMessage());
 					c.getFiles().forEach(f -> log.info("{} >>> ADDED [{}] MODIFIED [{}] DELETED [{}]", f.getStatus(), f.getAdditions(), f.getChanges(), f.getDeletions()));

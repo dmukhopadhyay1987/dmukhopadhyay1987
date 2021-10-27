@@ -25,11 +25,14 @@ public class RenewalProcessStartListener implements ExecutionListener {
 	@Autowired
 	GenericUtilityService genericUtilityService;
 
+	@Autowired
+	String loanVariableKey;
+
 	@Override
 	public void notify(DelegateExecution delegateExecution) {
 		log.info("Inside >>> {}",
 				delegateExecution.getCurrentActivityName());
-		String loanNumber = (String) delegateExecution.getVariable("loanNumber");
+		String loanNumber = (String) delegateExecution.getVariable(loanVariableKey);
 		processInfo.setLoanNumber(loanNumber);
 		processInfo.setStartDateTime(LocalDateTime.now().format(
 				DateTimeFormatter.ISO_DATE_TIME));
@@ -39,6 +42,6 @@ public class RenewalProcessStartListener implements ExecutionListener {
 						processInfo.getLoanNumber(),
 						genericUtilityService.getQualifiedFilePath(processInfo.getLoanNumber(), ProcessInfo.class),
 						processInfo,
-						delegateExecution.getCurrentActivityName()).getSha());
+						genericUtilityService.commitMessage(delegateExecution, false)).getSha());
 	}
 }

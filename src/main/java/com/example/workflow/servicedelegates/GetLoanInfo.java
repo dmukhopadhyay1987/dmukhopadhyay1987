@@ -43,6 +43,6 @@ public class GetLoanInfo implements JavaDelegate {
 						processInfo.getLoanNumber(),
 						genericUtilityService.getQualifiedFilePath(processInfo.getLoanNumber(), ProcessInfo.class),
 						processInfo,
-						delegateExecution.getCurrentActivityName()).getSha());
+						genericUtilityService.commitMessage(delegateExecution, false)).getSha());
 	}
 }
