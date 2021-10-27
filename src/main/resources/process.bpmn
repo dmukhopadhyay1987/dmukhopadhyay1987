@@ -7,28 +7,18 @@
       </bpmn:extensionElements>
       <bpmn:outgoing>SequenceFlow_1fp17al</bpmn:outgoing>
     </bpmn:startEvent>
-    <bpmn:sequenceFlow id="SequenceFlow_1fp17al" sourceRef="startRenewal" targetRef="takeInput" />
+    <bpmn:sequenceFlow id="SequenceFlow_1fp17al" sourceRef="startRenewal" targetRef="getLoanInfo" />
     <bpmn:endEvent id="endRenewal" name="End Renewal">
       <bpmn:extensionElements>
         <camunda:executionListener delegateExpression="${renewalProcessEndListener}" event="start" />
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_1lqk8ee</bpmn:incoming>
-    </bpmn:endEvent>
-    <bpmn:sequenceFlow id="Flow_1d2btb4" sourceRef="takeInput" targetRef="getLoanInfo" />
-    <bpmn:sequenceFlow id="Flow_1lqk8ee" sourceRef="viewInput" targetRef="endRenewal" />
-    <bpmn:userTask id="viewInput" name="View Input">
       <bpmn:incoming>Flow_1fwvy1e</bpmn:incoming>
-      <bpmn:outgoing>Flow_1lqk8ee</bpmn:outgoing>
-    </bpmn:userTask>
-    <bpmn:userTask id="takeInput" name="Take Input">
-      <bpmn:incoming>SequenceFlow_1fp17al</bpmn:incoming>
-      <bpmn:outgoing>Flow_1d2btb4</bpmn:outgoing>
-    </bpmn:userTask>
+    </bpmn:endEvent>
     <bpmn:serviceTask id="getLoanInfo" name="Get Loan Info" camunda:delegateExpression="${getLoanInfo}">
-      <bpmn:incoming>Flow_1d2btb4</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_1fp17al</bpmn:incoming>
       <bpmn:outgoing>Flow_0xceahg</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="Flow_1fwvy1e" sourceRef="getProposalInfo" targetRef="viewInput" />
+    <bpmn:sequenceFlow id="Flow_1fwvy1e" sourceRef="getProposalInfo" targetRef="endRenewal" />
     <bpmn:serviceTask id="getProposalInfo" name="Get Proposal Info" camunda:delegateExpression="${getProposalInfo}">
       <bpmn:incoming>Flow_1jvudl8</bpmn:incoming>
       <bpmn:outgoing>Flow_1fwvy1e</bpmn:outgoing>
@@ -52,19 +42,11 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1fwvy1e_di" bpmnElement="Flow_1fwvy1e" bioc:stroke="#8e24aa" color:border-color="#8e24aa">
         <di:waypoint x="910" y="117" />
-        <di:waypoint x="990" y="117" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1lqk8ee_di" bpmnElement="Flow_1lqk8ee">
-        <di:waypoint x="1090" y="117" />
         <di:waypoint x="1182" y="117" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1d2btb4_di" bpmnElement="Flow_1d2btb4" bioc:stroke="#8e24aa" color:border-color="#8e24aa">
-        <di:waypoint x="360" y="117" />
-        <di:waypoint x="440" y="117" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_1fp17al_di" bpmnElement="SequenceFlow_1fp17al">
         <di:waypoint x="178" y="117" />
-        <di:waypoint x="260" y="117" />
+        <di:waypoint x="440" y="117" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="startRenewal" bioc:stroke="#000000" bioc:fill="#ffffff" color:background-color="#ffffff" color:border-color="#000000">
         <dc:Bounds x="142" y="99" width="36" height="36" />
@@ -77,12 +59,6 @@
         <bpmndi:BPMNLabel>
           <dc:Bounds x="1167" y="142" width="66" height="14" />
         </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1rt2mx1_di" bpmnElement="viewInput" bioc:stroke="#fb8c00" bioc:fill="#ffe0b2" color:background-color="#ffe0b2" color:border-color="#fb8c00">
-        <dc:Bounds x="990" y="77" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="UserTask_08mft2c_di" bpmnElement="takeInput" bioc:stroke="#fb8c00" bioc:fill="#ffe0b2" color:background-color="#ffe0b2" color:border-color="#fb8c00">
-        <dc:Bounds x="260" y="77" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0xl9hw0_di" bpmnElement="getLoanInfo" bioc:stroke="#8e24aa" bioc:fill="#e1bee7" color:background-color="#e1bee7" color:border-color="#8e24aa">
         <dc:Bounds x="440" y="77" width="100" height="80" />

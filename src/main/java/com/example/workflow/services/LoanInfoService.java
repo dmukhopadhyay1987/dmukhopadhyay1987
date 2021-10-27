@@ -10,7 +10,7 @@ public class LoanInfoService {
 
 	public LoanResponseDto getLoan(String loanNumber) {
 		log.info("Inside >> {}",
-				this.getClass().getName());
+				this.getClass().getSimpleName());
 		var result = new LoanResponseDto();
 		result.setLoan(loanNumber);
 		result.setCustomerId("WE4F3W5E4F35E4F");

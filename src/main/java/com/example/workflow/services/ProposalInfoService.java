@@ -11,7 +11,7 @@ public class ProposalInfoService {
 
 	public ProposalResponseDto getProposal(ProposalRequestDto proposalRequestDto) {
 		log.info("Inside >> {}",
-				this.getClass().getName());
+				this.getClass().getSimpleName());
 		var result = new ProposalResponseDto();
 		result.setLoan(proposalRequestDto.getLoanNum());
 		result.setCustomerId(proposalRequestDto.getCustId());
