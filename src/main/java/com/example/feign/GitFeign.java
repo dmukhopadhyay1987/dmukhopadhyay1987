@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.util.List;
 import java.util.Optional;
 
 @FeignClient(name = "gitHubClient",
@@ -39,6 +40,9 @@ public interface GitFeign {
 
 	@GetMapping("/git/refs/heads/{ref}")
 	Optional<Reference> ref(@PathVariable("ref") String refName);
+
+	@GetMapping("/commits")
+	List<Commit> commits();
 
 	@PostMapping(value = "/git/blobs", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	Blob createBlob(@RequestBody BlobRequest blobReq);

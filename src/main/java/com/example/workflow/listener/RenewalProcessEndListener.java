@@ -52,9 +52,8 @@ public class RenewalProcessEndListener implements ExecutionListener {
 		persistenceService.merge(processInfo.getLoanNumber(), genericUtilityService.commitMessage(delegateExecution, true));
 		delegateExecution.removeVariable(loanVariableKey);
 		delegateExecution.removeVariable(proposalResponseVariableKey);
-		persistenceService.history(genericUtilityService.getQualifiedFilePath(processInfo.getLoanNumber(), ProcessInfo.class))
-				.get(10, TimeUnit.SECONDS)
-				.stream().filter(commit -> !commit.getFiles().isEmpty())
+		persistenceService.history(processInfo.getLoanNumber())
+				.stream().filter(commit -> commit.getFiles()!= null && !commit.getFiles().isEmpty())
 				.toList().forEach(c -> {
 					log.info("Commit {} at {} :: '{}'", c.getSha(), c.getCommitDetails().getCommitter().getDate(), c.getCommitDetails().getMessage());
 					c.getFiles().forEach(f -> log.info("{} >>> ADDED [{}] MODIFIED [{}] DELETED [{}]", f.getStatus(), f.getAdditions(), f.getChanges(), f.getDeletions()));

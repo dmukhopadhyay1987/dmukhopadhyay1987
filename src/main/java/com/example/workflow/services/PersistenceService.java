@@ -137,38 +137,13 @@ public class PersistenceService<T> {
 		gitClient.deleteBranch(branchName);
 	}
 
-	public CompletableFuture<List<Commit>> history(String path) {
+	public List<Commit> history(String path) {
 		log.info("GET commits '{}'", path);
-		return CompletableFuture.supplyAsync(() -> chain(path,
-				commit(ref("main").orElseThrow()
-						.getObject()
-						.getSha()), null));
-	}
-
-	private List<Commit> chain(String path, Commit head, final List<Commit> list) {
-		List<Commit> localList = new CopyOnWriteArrayList<>(
-				Objects.requireNonNullElseGet(
-						list,
-						() -> !head.getCommitDetails().getMessage().contains("Merge") ? List.of(head) : List.of()));
-		List<Commit> parents = commit(head.getSha()).getParents();
-		Commit parent = parents.stream()
-				.map(p -> commit(p.getSha()))
-				.max(Comparator.comparing(
-						a -> LocalDateTime.parse(
-								a.getCommitDetails().getCommitter().getDate(),
-								DateTimeFormatter.ISO_DATE_TIME)))
-				.orElse(null);
-		if (parent != null && tree(
-				parent.getCommitDetails().getTree().getSha())
-				.getTreeDetail()
-				.stream().anyMatch(
-						t -> t.getType().equals("tree")
-								&& path.contains(t.getPath()))) {
-			if (!parent.getCommitDetails()
-					.getMessage()
-					.contains("Merge")) localList.add(parent);
-			return chain(path, commit(parent.getSha()), localList);
-		}
-		return localList;
+		return gitClient.commits()
+				.parallelStream()
+				.filter(c -> c.getCommitDetails().getMessage().contains(path))
+				.filter(c -> !c.getCommitDetails().getMessage().contains("Merge"))
+				.map(c -> commit(c.getSha()))
+				.collect(Collectors.toList());
 	}
 }
