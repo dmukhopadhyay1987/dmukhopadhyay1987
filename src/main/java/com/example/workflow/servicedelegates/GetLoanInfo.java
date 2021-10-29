@@ -36,13 +36,15 @@ public class GetLoanInfo implements JavaDelegate {
 						ProcessInfo.class),
 				genericUtilityService.processInfoSha(delegateExecution),
 				ProcessInfo.class);
-		processInfo.setLoanDetails(loanResponseDto);
-		genericUtilityService.setBusinessKey(delegateExecution,
-				loanNumber,
-				persistenceService.save(
-						processInfo.getLoanNumber(),
-						genericUtilityService.getQualifiedFilePath(processInfo.getLoanNumber(), ProcessInfo.class),
-						processInfo,
-						genericUtilityService.commitMessage(delegateExecution, false)).getSha());
+		if (processInfo.getLoanDetails() == null) {
+			processInfo.setLoanDetails(loanResponseDto);
+			genericUtilityService.setBusinessKey(delegateExecution,
+					loanNumber,
+					persistenceService.save(
+							processInfo.getLoanNumber(),
+							genericUtilityService.getQualifiedFilePath(processInfo.getLoanNumber(), ProcessInfo.class),
+							processInfo,
+							genericUtilityService.commitMessage(delegateExecution, false)).getSha());
+		}
 	}
 }

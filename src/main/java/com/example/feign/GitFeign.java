@@ -8,7 +8,6 @@ import com.example.feign.model.CommitRequest;
 import com.example.feign.model.MergeRequest;
 import com.example.feign.model.TreeRequest;
 import com.example.vo.Blob;
-import com.example.vo.Branch;
 import com.example.vo.Commit;
 import com.example.vo.Reference;
 import com.example.vo.Tree;
@@ -51,14 +50,14 @@ public interface GitFeign {
 	Reference createBranch(@RequestBody BranchRequest branchReq);
 
 	@PatchMapping(value = "/git/refs/heads/{branch}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	Branch updateBranch(@PathVariable("branch") String branch, @RequestBody BranchUpdateRequest branchUpdateReq);
+	void updateBranch(@PathVariable("branch") String branch, @RequestBody BranchUpdateRequest branchUpdateReq);
 
 	@PostMapping(value = "/git/commits", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	Commit createCommit(@RequestBody CommitRequest commitReq);
 
 	@PostMapping(value = "/merges", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	Commit merge(@RequestBody MergeRequest mergeReq);
+	void merge(@RequestBody MergeRequest mergeReq);
 
 	@DeleteMapping("/git/refs/heads/{branch}")
-	Commit deleteBranch(@PathVariable("branch") String branch);
+	void deleteBranch(@PathVariable("branch") String branch);
 }

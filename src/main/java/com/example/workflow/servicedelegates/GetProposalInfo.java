@@ -46,14 +46,16 @@ public class GetProposalInfo implements JavaDelegate {
 						ProcessInfo.class),
 				genericUtilityService.processInfoSha(delegateExecution),
 				ProcessInfo.class);
-		processInfo.setProposalDetails(proposalResponseDto);
-		genericUtilityService.setBusinessKey(delegateExecution,
-				loanNumber,
-				persistenceService.save(
-				processInfo.getLoanNumber(),
-				genericUtilityService.getQualifiedFilePath(processInfo.getLoanNumber(), ProcessInfo.class),
-				processInfo,
-				genericUtilityService.commitMessage(delegateExecution, false)).getSha());
+		if (processInfo.getProposalDetails() == null) {
+			processInfo.setProposalDetails(proposalResponseDto);
+			genericUtilityService.setBusinessKey(delegateExecution,
+					loanNumber,
+					persistenceService.save(
+							processInfo.getLoanNumber(),
+							genericUtilityService.getQualifiedFilePath(processInfo.getLoanNumber(), ProcessInfo.class),
+							processInfo,
+							genericUtilityService.commitMessage(delegateExecution, false)).getSha());
+		}
 		delegateExecution.removeVariable(proposalRequestVariableKey);
 	}
 }

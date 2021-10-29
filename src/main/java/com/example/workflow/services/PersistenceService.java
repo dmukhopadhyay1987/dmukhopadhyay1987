@@ -27,6 +27,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
@@ -136,12 +137,12 @@ public class PersistenceService<T> {
 		gitClient.deleteBranch(branchName);
 	}
 
-	public List<Commit> history(String path) {
+	public CompletableFuture<List<Commit>> history(String path) {
 		log.info("GET commits '{}'", path);
-		return chain(path,
+		return CompletableFuture.supplyAsync(() -> chain(path,
 				commit(ref("main").orElseThrow()
 						.getObject()
-						.getSha()), null);
+						.getSha()), null));
 	}
 
 	private List<Commit> chain(String path, Commit head, final List<Commit> list) {
