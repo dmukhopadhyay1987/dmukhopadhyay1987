@@ -33,17 +33,17 @@ public class RenewalProcessStartListener implements ExecutionListener {
 		log.info("Inside >>> {}",
 				delegateExecution.getCurrentActivityName());
 		String loanNumber = (String) delegateExecution.getVariable(loanVariableKey);
-		if (processInfo.getLoanNumber() == null) {
-			processInfo.setLoanNumber(loanNumber);
+		if (processInfo.getStartDateTime() == null) {
 			processInfo.setStartDateTime(LocalDateTime.now().format(
 					DateTimeFormatter.ISO_DATE_TIME));
-			genericUtilityService.setBusinessKey(delegateExecution,
-					loanNumber,
-					persistenceService.save(
-							processInfo.getLoanNumber(),
-							genericUtilityService.getQualifiedFilePath(processInfo.getLoanNumber(), ProcessInfo.class),
-							processInfo,
-							genericUtilityService.commitMessage(delegateExecution, false)).getSha());
 		}
+		processInfo.setLoanNumber(loanNumber);
+		genericUtilityService.setBusinessKey(delegateExecution,
+				loanNumber,
+				persistenceService.save(
+						processInfo.getLoanNumber(),
+						genericUtilityService.getQualifiedFilePath(processInfo.getLoanNumber(), ProcessInfo.class),
+						processInfo,
+						genericUtilityService.commitMessage(delegateExecution, false)).getSha());
 	}
 }
