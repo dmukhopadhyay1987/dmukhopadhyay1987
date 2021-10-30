@@ -7,6 +7,8 @@ import lombok.Setter;
 import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
+
 @Component
 @Setter
 @Getter
@@ -21,4 +23,5 @@ public class ProcessInfo {
 	LoanResponseDto loanDetails;
 	ProposalResponseDto proposalDetails;
 	String endDateTime;
+	List<ProcessInfo> history;
 }

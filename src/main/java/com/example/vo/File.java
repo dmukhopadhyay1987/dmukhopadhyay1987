@@ -17,4 +17,5 @@ public class File {
 	int additions;
 	int deletions;
 	int changes;
+	String patch;
 }

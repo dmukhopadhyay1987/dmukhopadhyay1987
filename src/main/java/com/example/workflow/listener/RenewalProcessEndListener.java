@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -40,23 +40,20 @@ public class RenewalProcessEndListener implements ExecutionListener {
 		ProcessInfo processInfo = persistenceService.get(genericUtilityService.getQualifiedFilePath(loanNumber, ProcessInfo.class),
 				genericUtilityService.processInfoSha(delegateExecution),
 				ProcessInfo.class);
-		if (processInfo.getEndDateTime() == null) {
-			processInfo.setEndDateTime(LocalDateTime.now().format(
-					DateTimeFormatter.ISO_DATE_TIME));
-			persistenceService.save(
-					processInfo.getLoanNumber(),
-					genericUtilityService.getQualifiedFilePath(processInfo.getLoanNumber(), ProcessInfo.class),
-					processInfo,
-					genericUtilityService.commitMessage(delegateExecution, false));
-		}
+		processInfo.setEndDateTime(LocalDateTime.now().format(
+				DateTimeFormatter.ISO_DATE_TIME));
+		processInfo.setHistory(persistenceService.history(processInfo.getLoanNumber(),
+						c -> c.getCommitDetails().getMessage().contains(processInfo.getLoanNumber()),
+						ProcessInfo.class)
+				.stream().peek(h -> h.setHistory(null))
+				.collect(Collectors.toList()));
+		persistenceService.save(
+				processInfo.getLoanNumber(),
+				genericUtilityService.getQualifiedFilePath(processInfo.getLoanNumber(), ProcessInfo.class),
+				processInfo,
+				genericUtilityService.commitMessage(delegateExecution, false));
 		persistenceService.merge(processInfo.getLoanNumber(), genericUtilityService.commitMessage(delegateExecution, true));
 		delegateExecution.removeVariable(loanVariableKey);
 		delegateExecution.removeVariable(proposalResponseVariableKey);
-		persistenceService.history(processInfo.getLoanNumber())
-				.stream().filter(commit -> commit.getFiles()!= null && !commit.getFiles().isEmpty())
-				.toList().forEach(c -> {
-					log.info("Commit {} at {} :: '{}'", c.getSha(), c.getCommitDetails().getCommitter().getDate(), c.getCommitDetails().getMessage());
-					c.getFiles().forEach(f -> log.info("{} >>> ADDED [{}] MODIFIED [{}] DELETED [{}]", f.getStatus(), f.getAdditions(), f.getChanges(), f.getDeletions()));
-				});
 	}
 }

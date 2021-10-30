@@ -20,15 +20,10 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Base64;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Service
@@ -137,13 +132,24 @@ public class PersistenceService<T> {
 		gitClient.deleteBranch(branchName);
 	}
 
-	public List<Commit> history(String path) {
+	public List<T> history(String path, Predicate<Commit> filetrCriteria, Class<T> c) {
 		log.info("GET commits '{}'", path);
 		return gitClient.commits()
 				.parallelStream()
-				.filter(c -> c.getCommitDetails().getMessage().contains(path))
-				.filter(c -> !c.getCommitDetails().getMessage().contains("Merge"))
-				.map(c -> commit(c.getSha()))
+				.filter(filetrCriteria)
+				.filter(c1 -> c1.getCommitDetails().getMessage().contains("Merge"))
+				.map(c2 -> commit(c2.getSha()))
+				.filter(c3 -> c3.getFiles() != null && !c3.getFiles().isEmpty())
+				.map(c4 -> blob(c4.getFiles().stream().findFirst().orElseThrow()
+						.getSha()).getBase64content()
+						.replace("\n", "")
+						.replace("\r", ""))
+				.map(coded -> decode(coded, c))
 				.collect(Collectors.toList());
+	}
+
+	@SneakyThrows
+	private T decode(String s, Class<T> c) {
+		return objectMapper.readValue(Base64.getDecoder().decode(s), c);
 	}
 }
