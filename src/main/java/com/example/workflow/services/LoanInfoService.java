@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import java.math.BigInteger;
 import java.util.Random;
 
+import static org.apache.commons.lang3.RandomStringUtils.random;
+
 @Service
 @Slf4j
 public class LoanInfoService {
@@ -25,7 +27,7 @@ public class LoanInfoService {
 				String.valueOf(
 						new Random().nextInt(
 								1000000))).doubleValue());
-		result.setProductType(RandomStringUtils.random(
+		result.setProductType(random(
 				3,
 				true,
 				false).toUpperCase());
