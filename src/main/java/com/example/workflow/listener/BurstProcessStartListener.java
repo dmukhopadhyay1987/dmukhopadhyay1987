@@ -9,33 +9,33 @@ import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Base64;
-import java.util.List;
-import java.util.UUID;
 
 @Component
 @Slf4j
 public class BurstProcessStartListener implements ExecutionListener {
 
+	public static final String DATE_TIME_FORMAT = "YYYYMMDD";
 	@Autowired
 	PersistenceService<ReportInfo> persistenceService;
 
 	@Autowired
 	BurstProcessUtilityService burstProcessUtilityService;
 
+	@Autowired
+	String reportVariableKey;
+
 	@Override
 	public void notify(DelegateExecution delegateExecution) {
 		log.info("Inside >>> {}",
 				delegateExecution.getCurrentActivityName());
-		String dateTime = LocalDateTime.now().format(
-				DateTimeFormatter.ISO_DATE_TIME);
-		String processId = Base64.getEncoder().encodeToString(dateTime.getBytes(StandardCharsets.UTF_8));
+		String dateTime = LocalDate.now().format(
+				DateTimeFormatter.ofPattern(DATE_TIME_FORMAT));
+		delegateExecution.setVariable(reportVariableKey, dateTime);
 		burstProcessUtilityService.setBusinessKey(delegateExecution,
-				processId,
-				persistenceService.save(burstProcessUtilityService.getBranchName(processId),
+				dateTime,
+				persistenceService.save(burstProcessUtilityService.getBranchName(dateTime),
 						burstProcessUtilityService.getQualifiedReportFilePath(
 								dateTime,
 								ReportInfo.class),

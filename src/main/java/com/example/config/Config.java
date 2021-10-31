@@ -20,6 +20,7 @@ public class Config {
 	private static final String LOAN_NUMBERS_VARIABLE_KEY = "loanNumbers";
 	private static final String PROPOSAL_REQUEST_VARIABLE_KEY = "proposalRequestDto";
 	private static final String PROPOSAL_RESPONSE_VARIABLE_KEY = "proposalResponseDto";
+	public static final String REPORT_VARIABLE_KEY = "report";
 
 	@Bean("processBusinessKeyDelimiter") String processBusinessKeyDelimiter() {
 		return PROCESS_BUSINESS_KEY_DELIMITER;
@@ -39,6 +40,10 @@ public class Config {
 
 	@Bean("proposalResponseVariableKey") String proposalResponseVariableKey() {
 		return PROPOSAL_RESPONSE_VARIABLE_KEY;
+	}
+
+	@Bean("reportVariableKey") String reportVariableKey() {
+		return REPORT_VARIABLE_KEY;
 	}
 
 	@Bean

@@ -9,8 +9,10 @@ import lombok.Value;
 import org.dozer.Mapping;
 import org.springframework.stereotype.Component;
 
-@Value
-@Builder
+@Component
+@Getter
+@Setter
+@NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ProposalRequestDto {
 	@Mapping("loan")

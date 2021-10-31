@@ -16,7 +16,6 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,7 +27,7 @@ public class BurstProcessEndListener implements ExecutionListener {
 	String loansVariableKey;
 
 	@Autowired
-	PersistenceService<ReportInfo> persistenceService;
+	PersistenceService<ReportInfo> burstPersistenceService;
 
 	@Autowired
 	PersistenceService<LoanModificationInfo> individualPersistenceService;
@@ -44,29 +43,37 @@ public class BurstProcessEndListener implements ExecutionListener {
 		log.info("Inside >>> {}",
 				delegateExecution.getCurrentActivityName());
 		List<String> loanNumbers = 	(List<String>) delegateExecution.getVariable(loansVariableKey);
-		ReportInfo reportInfo = persistenceService.get(burstProcessUtilityService.getQualifiedReportFilePath(
-						new String(Base64.getDecoder().decode(
-								burstProcessUtilityService.processId(
-										delegateExecution))),
+		String processId = burstProcessUtilityService.processId(delegateExecution);
+		ReportInfo reportInfo = burstPersistenceService.get(burstProcessUtilityService.getQualifiedReportFilePath(
+						processId,
 						ReportInfo.class),
 				burstProcessUtilityService.reportInfoSha(delegateExecution),
 				ReportInfo.class);
-		ReportInfo.builder()
-				.startDateTime(reportInfo.getStartDateTime())
-				.loanReportInfos(loanNumbers.stream()
-						.map(l -> LoanReportInfo.builder()
-								.loanNumber(l)
-								.stages(individualPersistenceService.history(
-										individualProcessUtilityService.getQualifiedLoanFilePath(l, LoanModificationInfo.class),
-												c -> LocalDateTime.parse(c.getCommitDetails().getAuthor().getDate(), DateTimeFormatter.ISO_LOCAL_DATE_TIME).isAfter(LocalDate.now().atStartOfDay()),
-												LoanModificationInfo.class).entrySet().stream()
-										.map(lm -> LoanModificationStageInfo.builder()
-												.dateTime(lm.getKey())
-												.loanModificationInfo(lm.getValue())
-												.build())
-										.collect(Collectors.toList()))
-								.build()
-						).collect(Collectors.toList())
-				).build();
+		burstPersistenceService.save(burstProcessUtilityService.getBranchName(processId),
+				burstProcessUtilityService.getQualifiedReportFilePath(processId, ReportInfo.class),
+				ReportInfo.builder()
+						.startDateTime(reportInfo.getStartDateTime())
+						.loanReportInfos(loanNumbers.stream()
+								.map(l -> LoanReportInfo.builder()
+										.loanNumber(l)
+										.stages(individualPersistenceService.history(
+														individualProcessUtilityService.getQualifiedLoanFilePath(l, LoanModificationInfo.class),
+														c -> LocalDateTime.parse(c.getCommitDetails().getAuthor().getDate(), DateTimeFormatter.ISO_LOCAL_DATE_TIME).isAfter(LocalDate.now().atStartOfDay()),
+														LoanModificationInfo.class).entrySet().stream()
+												.map(lm -> LoanModificationStageInfo.builder()
+														.dateTime(lm.getKey())
+														.loanModificationInfo(lm.getValue())
+														.build())
+												.collect(Collectors.toList()))
+										.build()
+								).collect(Collectors.toList())
+						).build(),
+				burstProcessUtilityService.commitMessage(delegateExecution, false));
+		burstPersistenceService.merge(burstProcessUtilityService.getBranchName(
+						burstProcessUtilityService.processId(
+								delegateExecution)),
+				burstProcessUtilityService.commitMessage(delegateExecution,
+						true));
+		delegateExecution.removeVariable(loansVariableKey);
 	}
 }

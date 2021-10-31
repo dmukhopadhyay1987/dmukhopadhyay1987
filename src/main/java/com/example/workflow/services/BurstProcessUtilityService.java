@@ -14,10 +14,15 @@ public class BurstProcessUtilityService {
 	public static final String QUALIFIED_PATH_PREFIX = "ir/data/report/";
 
 	@Autowired
+	String reportVariableKey;
+
+	@Autowired
 	private String processBusinessKeyDelimiter;
 
 	public String processId(DelegateExecution delegateExecution) {
-		return getBusinessKey(delegateExecution).split(processBusinessKeyDelimiter)[0];
+		return getBusinessKey(delegateExecution) != null
+				? getBusinessKey(delegateExecution).split(processBusinessKeyDelimiter)[0]
+				: (String) delegateExecution.getVariable(reportVariableKey);
 	}
 
 	public String reportInfoSha(DelegateExecution delegateExecution) {
