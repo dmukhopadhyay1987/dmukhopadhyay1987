@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 @Component
 @Slf4j
-public class RenewalProcessEndListener implements ExecutionListener {
+public class IndividualProcessEndListener implements ExecutionListener {
 
 	@Autowired
 	PersistenceService<ProcessInfo> persistenceService;

@@ -8,6 +8,7 @@ import com.example.feign.model.CommitRequest;
 import com.example.feign.model.MergeRequest;
 import com.example.feign.model.TreeRequest;
 import com.example.vo.Blob;
+import com.example.vo.Branch;
 import com.example.vo.Commit;
 import com.example.vo.Reference;
 import com.example.vo.Tree;
@@ -78,6 +79,12 @@ public class PersistenceService<T> {
 		branchRequest.setSha(main.getObject().getSha());
 		branchRequest.setRef("refs/heads/" + branchName);
 		return ref(branchName).orElseGet(() -> gitClient.createBranch(branchRequest));
+	}
+
+	public List<Branch> branches() {
+		return gitClient.branches()
+				.stream().filter(b -> !b.getName().contains("main"))
+				.collect(Collectors.toList());
 	}
 
 	@SneakyThrows

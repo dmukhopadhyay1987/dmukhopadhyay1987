@@ -1,5 +1,7 @@
 package com.example.listener;
 
+import com.example.workflow.model.ProcessInfo;
+import com.example.workflow.services.PersistenceService;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.ProcessEngines;
@@ -23,6 +25,9 @@ public class ProcessTriggerEventListener {
 	@Autowired
 	String loansVariableKey;
 
+	@Autowired
+	PersistenceService<ProcessInfo> persistenceService;
+
 	@KafkaListener(topics = "loanReadyForRenewal", groupId = "group")
 	public void onMessage(String loanNumber) {
 		log.info("Received Loan # {}", loanNumber);
@@ -31,6 +36,7 @@ public class ProcessTriggerEventListener {
 		} else if (!loanNumber.equals("END")) {
 			loans.add(loanNumber);
 		} else {
+			persistenceService.branches().forEach(b -> loans.add(b.getName()));
 			ProcessEngines.getDefaultProcessEngine()
 					.getRuntimeService()
 					.createProcessInstanceByKey("burstRenewalProcess")

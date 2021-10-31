@@ -23,5 +23,6 @@ public class ProcessInfo {
 	LoanResponseDto loanDetails;
 	ProposalResponseDto proposalDetails;
 	String endDateTime;
+	String status;
 	List<ProcessInfo> history;
 }

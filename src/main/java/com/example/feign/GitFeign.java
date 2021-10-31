@@ -8,6 +8,7 @@ import com.example.feign.model.CommitRequest;
 import com.example.feign.model.MergeRequest;
 import com.example.feign.model.TreeRequest;
 import com.example.vo.Blob;
+import com.example.vo.Branch;
 import com.example.vo.Commit;
 import com.example.vo.Reference;
 import com.example.vo.Tree;
@@ -28,6 +29,9 @@ import java.util.Optional;
 		configuration = { GitFeignConfig.class},
 		decode404 = true)
 public interface GitFeign {
+
+	@GetMapping("/branches")
+	List<Branch> branches();
 
 	@GetMapping("/commits/{sha}")
 	Optional<Commit> commit(@PathVariable("sha") String sha);

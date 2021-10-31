@@ -48,6 +48,7 @@ public class GetProposalInfo implements JavaDelegate {
 				ProcessInfo.class);
 		if (processInfo.getProposalDetails() == null) {
 			processInfo.setProposalDetails(proposalResponseDto);
+			processInfo.setStatus("Offer Generated");
 			genericUtilityService.setBusinessKey(delegateExecution,
 					loanNumber,
 					persistenceService.save(
