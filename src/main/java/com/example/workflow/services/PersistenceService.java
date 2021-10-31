@@ -122,6 +122,7 @@ public class PersistenceService<T> {
 	}
 
 	public void merge(String branchName, String message) {
+		log.info("Merged branch [{}] >>> {}", branchName, message);
 		String head = ref(branchName).orElseThrow()
 				.getObject()
 				.getSha();
