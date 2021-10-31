@@ -3,7 +3,7 @@ package com.example.workflow.mapper;
 import com.example.workflow.model.LoanResponseDto;
 import com.example.workflow.model.ProcessInfo;
 import com.example.workflow.model.ProposalRequestDto;
-import com.example.workflow.services.GenericUtilityService;
+import com.example.workflow.services.IndividualProcessUtilityService;
 import com.example.workflow.services.PersistenceService;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -23,7 +23,7 @@ public class ProposalRequestMapper implements JavaDelegate {
 	PersistenceService<ProcessInfo> persistenceService;
 
 	@Autowired
-	GenericUtilityService genericUtilityService;
+	IndividualProcessUtilityService individualProcessUtilityService;
 
 	@Autowired
 	String proposalRequestVariableKey;
@@ -32,10 +32,10 @@ public class ProposalRequestMapper implements JavaDelegate {
 	public void execute(DelegateExecution delegateExecution) {
 		log.info("Inside >>> {}",
 				delegateExecution.getCurrentActivityName());
-		String loanNumber = genericUtilityService.loanNumber(delegateExecution);
+		String loanNumber = individualProcessUtilityService.loanNumber(delegateExecution);
 		LoanResponseDto loanResponseDto = persistenceService.get(
-				genericUtilityService.getQualifiedLoanFilePath(loanNumber, ProcessInfo.class),
-				genericUtilityService.processInfoSha(delegateExecution),
+				individualProcessUtilityService.getQualifiedLoanFilePath(loanNumber, ProcessInfo.class),
+				individualProcessUtilityService.processInfoSha(delegateExecution),
 				ProcessInfo.class).getLoanDetails();
 		ProposalRequestDto proposalRequestDto = dozerBeanMapper.map(loanResponseDto, ProposalRequestDto.class);
 		delegateExecution.setVariable(proposalRequestVariableKey, proposalRequestDto);

@@ -1,7 +1,7 @@
 package com.example.workflow.listener;
 
 import com.example.workflow.model.ProcessInfo;
-import com.example.workflow.services.GenericUtilityService;
+import com.example.workflow.services.IndividualProcessUtilityService;
 import com.example.workflow.services.PersistenceService;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -23,7 +23,7 @@ public class IndividualProcessStartListener implements ExecutionListener {
 	private ProcessInfo processInfo;
 
 	@Autowired
-	GenericUtilityService genericUtilityService;
+	IndividualProcessUtilityService individualProcessUtilityService;
 
 	@Autowired
 	String loanVariableKey;
@@ -42,12 +42,12 @@ public class IndividualProcessStartListener implements ExecutionListener {
 				(processInfo.getStatus() != null && !processInfo.getStatus().equals("Offer Generated"))) {
 			processInfo.setStatus("Ready for Renewal");
 		}
-		genericUtilityService.setBusinessKey(delegateExecution,
+		individualProcessUtilityService.setBusinessKey(delegateExecution,
 				loanNumber,
 				persistenceService.save(
-						genericUtilityService.getBranchName(loanNumber),
-						genericUtilityService.getQualifiedLoanFilePath(loanNumber, ProcessInfo.class),
+						individualProcessUtilityService.getBranchName(loanNumber),
+						individualProcessUtilityService.getQualifiedLoanFilePath(loanNumber, ProcessInfo.class),
 						processInfo,
-						genericUtilityService.commitMessage(delegateExecution, false)).getSha());
+						individualProcessUtilityService.commitMessage(delegateExecution, false)).getSha());
 	}
 }

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import java.util.Locale;
 
 @Service
-public class GenericUtilityService {
+public class IndividualProcessUtilityService {
 
 	public static final String BRANCH_NAME_PREFIX = "irpb/";
 	public static final String QUALIFIED_PATH_PREFIX = "ir/data/process/";

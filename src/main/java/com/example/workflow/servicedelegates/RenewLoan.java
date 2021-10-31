@@ -1,7 +1,7 @@
 package com.example.workflow.servicedelegates;
 
 import com.example.workflow.model.ProcessInfo;
-import com.example.workflow.services.GenericUtilityService;
+import com.example.workflow.services.IndividualProcessUtilityService;
 import com.example.workflow.services.PersistenceService;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -17,26 +17,26 @@ public class RenewLoan implements JavaDelegate {
 	PersistenceService<ProcessInfo> persistenceService;
 
 	@Autowired
-	GenericUtilityService genericUtilityService;
+	IndividualProcessUtilityService individualProcessUtilityService;
 
 	@Override
 	public void execute(DelegateExecution delegateExecution) {
 		log.info("Inside >>> {}",
 				delegateExecution.getCurrentActivityName());
-		String loanNumber = genericUtilityService.loanNumber(delegateExecution);
-		String qualifiedFilePath = genericUtilityService.getQualifiedLoanFilePath(loanNumber, ProcessInfo.class);
+		String loanNumber = individualProcessUtilityService.loanNumber(delegateExecution);
+		String qualifiedFilePath = individualProcessUtilityService.getQualifiedLoanFilePath(loanNumber, ProcessInfo.class);
 		ProcessInfo processInfo = persistenceService.get(
 				qualifiedFilePath,
-				genericUtilityService.processInfoSha(delegateExecution),
+				individualProcessUtilityService.processInfoSha(delegateExecution),
 				ProcessInfo.class);
 		processInfo.setStatus("Renewed");
-		genericUtilityService.setBusinessKey(delegateExecution,
+		individualProcessUtilityService.setBusinessKey(delegateExecution,
 				loanNumber,
 				persistenceService.save(
-						genericUtilityService.getBranchName(loanNumber),
+						individualProcessUtilityService.getBranchName(loanNumber),
 						qualifiedFilePath,
 						processInfo,
-						genericUtilityService.commitMessage(delegateExecution, false)).getSha());
+						individualProcessUtilityService.commitMessage(delegateExecution, false)).getSha());
 	}
 
 }

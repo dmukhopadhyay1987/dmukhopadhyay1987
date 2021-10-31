@@ -1,7 +1,7 @@
 package com.example.listener;
 
 import com.example.workflow.model.ProcessInfo;
-import com.example.workflow.services.GenericUtilityService;
+import com.example.workflow.services.IndividualProcessUtilityService;
 import com.example.workflow.services.PersistenceService;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +30,7 @@ public class ProcessTriggerEventListener {
 	PersistenceService<ProcessInfo> persistenceService;
 
 	@Autowired
-	GenericUtilityService genericUtilityService;
+	IndividualProcessUtilityService individualProcessUtilityService;
 
 	@KafkaListener(topics = "loanReadyForRenewal", groupId = "group")
 	public void onMessage(String loanNumber) {
@@ -40,7 +40,7 @@ public class ProcessTriggerEventListener {
 		} else if (loanNumber.equals("FIX")) {
 			loans = new ArrayList<>();
 			persistenceService.branches().forEach(b -> loans.add(
-					genericUtilityService.retrieveLoanNumber(
+					individualProcessUtilityService.retrieveLoanNumber(
 							b.getName())));
 			startBurstRenewalProcess();
 		} else if (!loanNumber.equals("END")) {

@@ -1,7 +1,7 @@
 package com.example.workflow.listener;
 
 import com.example.workflow.model.ProcessInfo;
-import com.example.workflow.services.GenericUtilityService;
+import com.example.workflow.services.IndividualProcessUtilityService;
 import com.example.workflow.services.PersistenceService;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +22,7 @@ public class IndividualProcessEndListener implements ExecutionListener {
 	PersistenceService<ProcessInfo> persistenceService;
 
 	@Autowired
-	GenericUtilityService genericUtilityService;
+	IndividualProcessUtilityService individualProcessUtilityService;
 
 	@Autowired
 	String loanVariableKey;
@@ -36,12 +36,12 @@ public class IndividualProcessEndListener implements ExecutionListener {
 
 		log.info("Inside >>> {}",
 				delegateExecution.getCurrentActivityName());
-		String loanNumber = genericUtilityService.loanNumber(delegateExecution);
-		String qualifiedFilePath = genericUtilityService.getQualifiedLoanFilePath(
+		String loanNumber = individualProcessUtilityService.loanNumber(delegateExecution);
+		String qualifiedFilePath = individualProcessUtilityService.getQualifiedLoanFilePath(
 				loanNumber,
 				ProcessInfo.class);
 		ProcessInfo processInfo = persistenceService.get(qualifiedFilePath,
-				genericUtilityService.processInfoSha(delegateExecution),
+				individualProcessUtilityService.processInfoSha(delegateExecution),
 				ProcessInfo.class);
 		processInfo.setEndDateTime(LocalDateTime.now().format(
 				DateTimeFormatter.ISO_DATE_TIME));
@@ -51,13 +51,13 @@ public class IndividualProcessEndListener implements ExecutionListener {
 				.stream().peek(h -> h.setHistory(null))
 				.collect(Collectors.toList()));
 		persistenceService.save(
-				genericUtilityService.getBranchName(loanNumber),
+				individualProcessUtilityService.getBranchName(loanNumber),
 				qualifiedFilePath,
 				processInfo,
-				genericUtilityService.commitMessage(delegateExecution, false));
+				individualProcessUtilityService.commitMessage(delegateExecution, false));
 		persistenceService.merge(
-				genericUtilityService.getBranchName(loanNumber),
-				genericUtilityService.commitMessage(delegateExecution, true));
+				individualProcessUtilityService.getBranchName(loanNumber),
+				individualProcessUtilityService.commitMessage(delegateExecution, true));
 		delegateExecution.removeVariable(loanVariableKey);
 		delegateExecution.removeVariable(proposalResponseVariableKey);
 	}

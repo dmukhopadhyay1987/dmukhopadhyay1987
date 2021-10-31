@@ -2,7 +2,7 @@ package com.example.workflow.servicedelegates;
 
 import com.example.workflow.model.LoanResponseDto;
 import com.example.workflow.model.ProcessInfo;
-import com.example.workflow.services.GenericUtilityService;
+import com.example.workflow.services.IndividualProcessUtilityService;
 import com.example.workflow.services.LoanInfoService;
 import com.example.workflow.services.PersistenceService;
 import lombok.extern.slf4j.Slf4j;
@@ -22,30 +22,30 @@ public class GetLoanInfo implements JavaDelegate {
 	PersistenceService<ProcessInfo> persistenceService;
 
 	@Autowired
-	GenericUtilityService genericUtilityService;
+	IndividualProcessUtilityService individualProcessUtilityService;
 
 	@Override
 	public void execute(DelegateExecution delegateExecution) {
 		log.info("Inside >>> {}",
 				delegateExecution.getCurrentActivityName());
-		String loanNumber = genericUtilityService.loanNumber(delegateExecution);
+		String loanNumber = individualProcessUtilityService.loanNumber(delegateExecution);
 		LoanResponseDto loanResponseDto = loanInfoService.getLoan(loanNumber);
-		String qualifiedFilePath = genericUtilityService.getQualifiedLoanFilePath(
+		String qualifiedFilePath = individualProcessUtilityService.getQualifiedLoanFilePath(
 				loanNumber,
 				ProcessInfo.class);
 		ProcessInfo processInfo = persistenceService.get(
 				qualifiedFilePath,
-				genericUtilityService.processInfoSha(delegateExecution),
+				individualProcessUtilityService.processInfoSha(delegateExecution),
 				ProcessInfo.class);
 		if (processInfo.getLoanDetails() == null) {
 			processInfo.setLoanDetails(loanResponseDto);
-			genericUtilityService.setBusinessKey(delegateExecution,
+			individualProcessUtilityService.setBusinessKey(delegateExecution,
 					loanNumber,
 					persistenceService.save(
-							genericUtilityService.getBranchName(loanNumber),
+							individualProcessUtilityService.getBranchName(loanNumber),
 							qualifiedFilePath,
 							processInfo,
-							genericUtilityService.commitMessage(delegateExecution, false)).getSha());
+							individualProcessUtilityService.commitMessage(delegateExecution, false)).getSha());
 		}
 	}
 }
