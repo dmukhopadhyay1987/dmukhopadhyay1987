@@ -1,7 +1,7 @@
 package com.example.workflow.servicedelegates;
 
 import com.example.workflow.model.LoanResponseDto;
-import com.example.workflow.model.ProcessInfo;
+import com.example.workflow.model.LoanModificationInfo;
 import com.example.workflow.services.IndividualProcessUtilityService;
 import com.example.workflow.services.LoanInfoService;
 import com.example.workflow.services.PersistenceService;
@@ -19,7 +19,7 @@ public class GetLoanInfo implements JavaDelegate {
 	LoanInfoService loanInfoService;
 
 	@Autowired
-	PersistenceService<ProcessInfo> persistenceService;
+	PersistenceService<LoanModificationInfo> persistenceService;
 
 	@Autowired
 	IndividualProcessUtilityService individualProcessUtilityService;
@@ -32,19 +32,19 @@ public class GetLoanInfo implements JavaDelegate {
 		LoanResponseDto loanResponseDto = loanInfoService.getLoan(loanNumber);
 		String qualifiedFilePath = individualProcessUtilityService.getQualifiedLoanFilePath(
 				loanNumber,
-				ProcessInfo.class);
-		ProcessInfo processInfo = persistenceService.get(
+				LoanModificationInfo.class);
+		LoanModificationInfo loanModificationInfo = persistenceService.get(
 				qualifiedFilePath,
 				individualProcessUtilityService.processInfoSha(delegateExecution),
-				ProcessInfo.class);
-		if (processInfo.getLoanDetails() == null) {
-			processInfo.setLoanDetails(loanResponseDto);
+				LoanModificationInfo.class);
+		if (loanModificationInfo.getLoanDetails() == null) {
+			loanModificationInfo.setLoanDetails(loanResponseDto);
 			individualProcessUtilityService.setBusinessKey(delegateExecution,
 					loanNumber,
 					persistenceService.save(
 							individualProcessUtilityService.getBranchName(loanNumber),
 							qualifiedFilePath,
-							processInfo,
+							loanModificationInfo,
 							individualProcessUtilityService.commitMessage(delegateExecution, false)).getSha());
 		}
 	}

@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.deser.std.StringDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -20,24 +21,23 @@ public class Config {
 	private static final String PROPOSAL_REQUEST_VARIABLE_KEY = "proposalRequestDto";
 	private static final String PROPOSAL_RESPONSE_VARIABLE_KEY = "proposalResponseDto";
 
-
-	@Bean String processBusinessKeyDelimiter() {
+	@Bean("processBusinessKeyDelimiter") String processBusinessKeyDelimiter() {
 		return PROCESS_BUSINESS_KEY_DELIMITER;
 	}
 
-	@Bean String loanVariableKey() {
+	@Bean("loanVariableKey") String loanVariableKey() {
 		return LOAN_NUMBER_VARIABLE_KEY;
 	}
 
-	@Bean String loansVariableKey() {
+	@Bean("loansVariableKey") String loansVariableKey() {
 		return LOAN_NUMBERS_VARIABLE_KEY;
 	}
 
-	@Bean String proposalRequestVariableKey() {
+	@Bean("proposalRequestVariableKey") String proposalRequestVariableKey() {
 		return PROPOSAL_REQUEST_VARIABLE_KEY;
 	}
 
-	@Bean String proposalResponseVariableKey() {
+	@Bean("proposalResponseVariableKey") String proposalResponseVariableKey() {
 		return PROPOSAL_RESPONSE_VARIABLE_KEY;
 	}
 
@@ -55,6 +55,8 @@ public class Config {
 		mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
 		mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
 		mapper.configure(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT, true);
+		mapper.configure(SerializationFeature.WRITE_ENUMS_USING_TO_STRING, true);
+		mapper.configure(DeserializationFeature.READ_ENUMS_USING_TO_STRING, true);
 		return mapper;
 	}
 

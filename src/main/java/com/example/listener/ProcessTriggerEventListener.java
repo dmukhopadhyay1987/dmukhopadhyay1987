@@ -1,6 +1,6 @@
 package com.example.listener;
 
-import com.example.workflow.model.ProcessInfo;
+import com.example.workflow.model.LoanModificationInfo;
 import com.example.workflow.services.IndividualProcessUtilityService;
 import com.example.workflow.services.PersistenceService;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -27,24 +27,24 @@ public class ProcessTriggerEventListener {
 	String loansVariableKey;
 
 	@Autowired
-	PersistenceService<ProcessInfo> persistenceService;
+	PersistenceService<LoanModificationInfo> persistenceService;
 
 	@Autowired
 	IndividualProcessUtilityService individualProcessUtilityService;
 
 	@KafkaListener(topics = "loanReadyForRenewal", groupId = "group")
-	public void onMessage(String loanNumber) {
-		log.info("Received Loan # {}", loanNumber);
-		if (loanNumber.equals("START")) {
+	public void onMessage(String message) {
+		log.info("Received Loan # {}", message);
+		if (message.equals("START")) {
 			loans = new ArrayList<>();
-		} else if (loanNumber.equals("FIX")) {
+		} else if (message.equals("FIX")) {
 			loans = new ArrayList<>();
 			persistenceService.branches().forEach(b -> loans.add(
 					individualProcessUtilityService.retrieveLoanNumber(
 							b.getName())));
 			startBurstRenewalProcess();
-		} else if (!loanNumber.equals("END")) {
-			loans.add(loanNumber);
+		} else if (!message.equals("END")) {
+			loans.add(message);
 		} else {
 			startBurstRenewalProcess();
 		}

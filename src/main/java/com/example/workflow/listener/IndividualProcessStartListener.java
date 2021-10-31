@@ -1,6 +1,7 @@
 package com.example.workflow.listener;
 
-import com.example.workflow.model.ProcessInfo;
+import com.example.workflow.model.LoanModificationInfo;
+import com.example.workflow.model.LoanStatus;
 import com.example.workflow.services.IndividualProcessUtilityService;
 import com.example.workflow.services.PersistenceService;
 import lombok.extern.slf4j.Slf4j;
@@ -17,10 +18,7 @@ import java.time.format.DateTimeFormatter;
 public class IndividualProcessStartListener implements ExecutionListener {
 
 	@Autowired
-	private PersistenceService<ProcessInfo> persistenceService;
-
-	@Autowired
-	private ProcessInfo processInfo;
+	private PersistenceService<LoanModificationInfo> persistenceService;
 
 	@Autowired
 	IndividualProcessUtilityService individualProcessUtilityService;
@@ -33,21 +31,22 @@ public class IndividualProcessStartListener implements ExecutionListener {
 		log.info("Inside >>> {}",
 				delegateExecution.getCurrentActivityName());
 		String loanNumber = (String) delegateExecution.getVariable(loanVariableKey);
-		if (processInfo.getStartDateTime() == null) {
-			processInfo.setStartDateTime(LocalDateTime.now().format(
-					DateTimeFormatter.ISO_DATE_TIME));
-		}
-		processInfo.setLoanNumber(loanNumber);
-		if (processInfo.getStatus() == null ||
-				(processInfo.getStatus() != null && !processInfo.getStatus().equals("Offer Generated"))) {
-			processInfo.setStatus("Ready for Renewal");
-		}
+
 		individualProcessUtilityService.setBusinessKey(delegateExecution,
 				loanNumber,
 				persistenceService.save(
 						individualProcessUtilityService.getBranchName(loanNumber),
-						individualProcessUtilityService.getQualifiedLoanFilePath(loanNumber, ProcessInfo.class),
-						processInfo,
+						individualProcessUtilityService.getQualifiedLoanFilePath(loanNumber, LoanModificationInfo.class),
+						getLoanModification(loanNumber),
 						individualProcessUtilityService.commitMessage(delegateExecution, false)).getSha());
+	}
+
+	private LoanModificationInfo getLoanModification(String loanNumber) {
+		return new LoanModificationInfo(
+				loanNumber, LocalDateTime.now().format(
+				DateTimeFormatter.ISO_DATE_TIME),
+				null, null, null,
+				LoanStatus.READY_FOR_RENEWAL,
+				null);
 	}
 }

@@ -8,24 +8,19 @@ import org.springframework.stereotype.Service;
 import java.util.Locale;
 
 @Service
-public class IndividualProcessUtilityService {
+public class BurstProcessUtilityService {
 
 	public static final String BRANCH_NAME_PREFIX = "irpb/";
-	public static final String QUALIFIED_PATH_PREFIX = "ir/data/process/";
+	public static final String QUALIFIED_PATH_PREFIX = "ir/data/report/";
 
 	@Autowired
 	private String processBusinessKeyDelimiter;
 
-	@Autowired
-	private String loanVariableKey;
-
-	public String loanNumber(DelegateExecution delegateExecution) {
-		return getBusinessKey(delegateExecution) != null
-				? getBusinessKey(delegateExecution).split(processBusinessKeyDelimiter)[0]
-				: (String) delegateExecution.getVariable(loanVariableKey);
+	public String processId(DelegateExecution delegateExecution) {
+		return getBusinessKey(delegateExecution).split(processBusinessKeyDelimiter)[0];
 	}
 
-	public String processInfoSha(DelegateExecution delegateExecution) {
+	public String reportInfoSha(DelegateExecution delegateExecution) {
 		return getBusinessKey(delegateExecution).split(processBusinessKeyDelimiter)[1];
 	}
 
@@ -33,20 +28,20 @@ public class IndividualProcessUtilityService {
 		return delegateExecution.getProcessInstance().getProcessBusinessKey();
 	}
 
-	public void setBusinessKey(DelegateExecution delegateExecution, String loanNumber, String processHead) {
-		delegateExecution.getProcessInstance().setProcessBusinessKey(loanNumber
+	public void setBusinessKey(DelegateExecution delegateExecution, String processId, String processHead) {
+		delegateExecution.getProcessInstance().setProcessBusinessKey(processId
 				.concat(processBusinessKeyDelimiter)
 				.concat(processHead));
 	}
 
 	public String commitMessage(DelegateExecution delegateExecution, boolean mergeCommit) {
 		return (mergeCommit ? "Merge " : StringUtils.EMPTY)
-				.concat(loanNumber(delegateExecution)).concat(StringUtils.SPACE)
+				.concat(processId(delegateExecution)).concat(StringUtils.SPACE)
 				.concat(delegateExecution.getProcessDefinitionId()).concat(StringUtils.SPACE).concat("[")
 				.concat(delegateExecution.getActivityInstanceId()).concat("]");
 	}
 
-	public String getQualifiedLoanFilePath(String path, Class<?> c) {
+	public String getQualifiedReportFilePath(String path, Class<?> c) {
 		return QUALIFIED_PATH_PREFIX
 				.concat(path)
 				.concat("/")
@@ -54,12 +49,8 @@ public class IndividualProcessUtilityService {
 				.concat(".json");
 	}
 
-	public String getBranchName(String loanNumber) {
-		return BRANCH_NAME_PREFIX.concat(loanNumber);
-	}
-
-	public String retrieveLoanNumber(String branchName) {
-		return branchName.replace(BRANCH_NAME_PREFIX, StringUtils.EMPTY);
+	public String getBranchName(String processId) {
+		return BRANCH_NAME_PREFIX.concat(processId);
 	}
 
 	private String getFileNameInRepo(Class<?> obj) {

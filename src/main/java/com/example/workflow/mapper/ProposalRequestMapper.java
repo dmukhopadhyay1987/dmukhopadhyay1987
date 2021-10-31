@@ -1,7 +1,7 @@
 package com.example.workflow.mapper;
 
 import com.example.workflow.model.LoanResponseDto;
-import com.example.workflow.model.ProcessInfo;
+import com.example.workflow.model.LoanModificationInfo;
 import com.example.workflow.model.ProposalRequestDto;
 import com.example.workflow.services.IndividualProcessUtilityService;
 import com.example.workflow.services.PersistenceService;
@@ -20,7 +20,7 @@ public class ProposalRequestMapper implements JavaDelegate {
 	DozerBeanMapper dozerBeanMapper;
 
 	@Autowired
-	PersistenceService<ProcessInfo> persistenceService;
+	PersistenceService<LoanModificationInfo> persistenceService;
 
 	@Autowired
 	IndividualProcessUtilityService individualProcessUtilityService;
@@ -34,9 +34,9 @@ public class ProposalRequestMapper implements JavaDelegate {
 				delegateExecution.getCurrentActivityName());
 		String loanNumber = individualProcessUtilityService.loanNumber(delegateExecution);
 		LoanResponseDto loanResponseDto = persistenceService.get(
-				individualProcessUtilityService.getQualifiedLoanFilePath(loanNumber, ProcessInfo.class),
+				individualProcessUtilityService.getQualifiedLoanFilePath(loanNumber, LoanModificationInfo.class),
 				individualProcessUtilityService.processInfoSha(delegateExecution),
-				ProcessInfo.class).getLoanDetails();
+				LoanModificationInfo.class).getLoanDetails();
 		ProposalRequestDto proposalRequestDto = dozerBeanMapper.map(loanResponseDto, ProposalRequestDto.class);
 		delegateExecution.setVariable(proposalRequestVariableKey, proposalRequestDto);
 	}

@@ -1,6 +1,7 @@
 package com.example.workflow.servicedelegates;
 
-import com.example.workflow.model.ProcessInfo;
+import com.example.workflow.model.LoanModificationInfo;
+import com.example.workflow.model.LoanStatus;
 import com.example.workflow.services.IndividualProcessUtilityService;
 import com.example.workflow.services.PersistenceService;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +15,7 @@ import org.springframework.stereotype.Component;
 public class RenewLoan implements JavaDelegate {
 
 	@Autowired
-	PersistenceService<ProcessInfo> persistenceService;
+	PersistenceService<LoanModificationInfo> persistenceService;
 
 	@Autowired
 	IndividualProcessUtilityService individualProcessUtilityService;
@@ -24,18 +25,18 @@ public class RenewLoan implements JavaDelegate {
 		log.info("Inside >>> {}",
 				delegateExecution.getCurrentActivityName());
 		String loanNumber = individualProcessUtilityService.loanNumber(delegateExecution);
-		String qualifiedFilePath = individualProcessUtilityService.getQualifiedLoanFilePath(loanNumber, ProcessInfo.class);
-		ProcessInfo processInfo = persistenceService.get(
+		String qualifiedFilePath = individualProcessUtilityService.getQualifiedLoanFilePath(loanNumber, LoanModificationInfo.class);
+		LoanModificationInfo loanModificationInfo = persistenceService.get(
 				qualifiedFilePath,
 				individualProcessUtilityService.processInfoSha(delegateExecution),
-				ProcessInfo.class);
-		processInfo.setStatus("Renewed");
+				LoanModificationInfo.class);
+		loanModificationInfo.setStatus(LoanStatus.RENEWED);
 		individualProcessUtilityService.setBusinessKey(delegateExecution,
 				loanNumber,
 				persistenceService.save(
 						individualProcessUtilityService.getBranchName(loanNumber),
 						qualifiedFilePath,
-						processInfo,
+						loanModificationInfo,
 						individualProcessUtilityService.commitMessage(delegateExecution, false)).getSha());
 	}
 

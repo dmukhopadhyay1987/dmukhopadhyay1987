@@ -1,28 +1,21 @@
 package com.example.workflow.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.Value;
 import org.springframework.stereotype.Component;
 
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
-@Component
-@Setter
-@Getter
-@NoArgsConstructor
+@Value
+@Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ProcessInfo {
+public class ReportInfo {
 
-	@NotNull
-	String loanNumber;
-	@NotNull
 	String startDateTime;
-	LoanResponseDto loanDetails;
-	ProposalResponseDto proposalDetails;
+	List<LoanReportInfo> loanReportInfos;
 	String endDateTime;
-	String status;
-	List<ProcessInfo> history;
 }

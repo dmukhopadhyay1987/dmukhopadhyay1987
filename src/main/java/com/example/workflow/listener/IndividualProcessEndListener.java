@@ -1,6 +1,6 @@
 package com.example.workflow.listener;
 
-import com.example.workflow.model.ProcessInfo;
+import com.example.workflow.model.LoanModificationInfo;
 import com.example.workflow.services.IndividualProcessUtilityService;
 import com.example.workflow.services.PersistenceService;
 import lombok.SneakyThrows;
@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 public class IndividualProcessEndListener implements ExecutionListener {
 
 	@Autowired
-	PersistenceService<ProcessInfo> persistenceService;
+	PersistenceService<LoanModificationInfo> persistenceService;
 
 	@Autowired
 	IndividualProcessUtilityService individualProcessUtilityService;
@@ -39,21 +39,21 @@ public class IndividualProcessEndListener implements ExecutionListener {
 		String loanNumber = individualProcessUtilityService.loanNumber(delegateExecution);
 		String qualifiedFilePath = individualProcessUtilityService.getQualifiedLoanFilePath(
 				loanNumber,
-				ProcessInfo.class);
-		ProcessInfo processInfo = persistenceService.get(qualifiedFilePath,
+				LoanModificationInfo.class);
+		LoanModificationInfo loanModificationInfo = persistenceService.get(qualifiedFilePath,
 				individualProcessUtilityService.processInfoSha(delegateExecution),
-				ProcessInfo.class);
-		processInfo.setEndDateTime(LocalDateTime.now().format(
+				LoanModificationInfo.class);
+		loanModificationInfo.setEndDateTime(LocalDateTime.now().format(
 				DateTimeFormatter.ISO_DATE_TIME));
-		processInfo.setHistory(persistenceService.history(qualifiedFilePath,
+		loanModificationInfo.setHistory(persistenceService.mergeHistory(qualifiedFilePath,
 						c -> c.getCommitDetails().getMessage().contains(loanNumber),
-						ProcessInfo.class)
+						LoanModificationInfo.class)
 				.stream().peek(h -> h.setHistory(null))
 				.collect(Collectors.toList()));
 		persistenceService.save(
 				individualProcessUtilityService.getBranchName(loanNumber),
 				qualifiedFilePath,
-				processInfo,
+				loanModificationInfo,
 				individualProcessUtilityService.commitMessage(delegateExecution, false));
 		persistenceService.merge(
 				individualProcessUtilityService.getBranchName(loanNumber),

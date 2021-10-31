@@ -23,7 +23,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.Base64;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.TreeMap;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -136,8 +138,8 @@ public class PersistenceService<T> {
 		gitClient.deleteBranch(branchName);
 	}
 
-	public List<T> history(String path, Predicate<Commit> filetrCriteria, Class<T> c) {
-		log.info("GET commits '{}'", path);
+	public List<T> mergeHistory(String path, Predicate<Commit> filetrCriteria, Class<T> c) {
+		log.info("GET merge commits '{}'", path);
 		return gitClient.commits()
 				.parallelStream()
 				.filter(filetrCriteria)
@@ -151,6 +153,25 @@ public class PersistenceService<T> {
 						.getSha()).getBase64content())
 				.map(coded -> decode(coded, c))
 				.collect(Collectors.toList());
+	}
+
+	public Map<String, T> history(String path, Predicate<Commit> filetrCriteria, Class<T> c) {
+		log.info("GET commits '{}'", path);
+		Map<String, T> historyMap = new TreeMap<>();
+		gitClient.commits()
+				.parallelStream()
+				.filter(filetrCriteria)
+				.filter(c1 -> !c1.getCommitDetails().getMessage().contains("Merge"))
+				.map(c2 -> commit(c2.getSha()))
+				.filter(c3 -> c3.getFiles() != null && !c3.getFiles().isEmpty())
+				.collect(Collectors.toList())
+				.forEach(c4 -> historyMap.put(c4.getCommitDetails().getCommitter().getDate(),
+						decode(blob(c4.getFiles()
+								.stream()
+								.filter(f -> path.contains(f.getFilename()))
+								.findFirst().orElseThrow()
+								.getSha()).getBase64content(), c)));
+		return historyMap;
 	}
 
 	@SneakyThrows

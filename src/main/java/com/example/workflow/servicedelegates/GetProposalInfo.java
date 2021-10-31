@@ -1,6 +1,7 @@
 package com.example.workflow.servicedelegates;
 
-import com.example.workflow.model.ProcessInfo;
+import com.example.workflow.model.LoanModificationInfo;
+import com.example.workflow.model.LoanStatus;
 import com.example.workflow.model.ProposalRequestDto;
 import com.example.workflow.model.ProposalResponseDto;
 import com.example.workflow.services.IndividualProcessUtilityService;
@@ -20,7 +21,7 @@ public class GetProposalInfo implements JavaDelegate {
 	ProposalInfoService proposalInfoService;
 
 	@Autowired
-	PersistenceService<ProcessInfo> persistenceService;
+	PersistenceService<LoanModificationInfo> persistenceService;
 
 	@Autowired
 	IndividualProcessUtilityService individualProcessUtilityService;
@@ -43,19 +44,19 @@ public class GetProposalInfo implements JavaDelegate {
 				proposalResponseDto);
 		String qualifiedFilePath = individualProcessUtilityService.getQualifiedLoanFilePath(
 				loanNumber,
-				ProcessInfo.class);
-		ProcessInfo processInfo = persistenceService.get(qualifiedFilePath,
+				LoanModificationInfo.class);
+		LoanModificationInfo loanModificationInfo = persistenceService.get(qualifiedFilePath,
 				individualProcessUtilityService.processInfoSha(delegateExecution),
-				ProcessInfo.class);
-		if (processInfo.getProposalDetails() == null) {
-			processInfo.setProposalDetails(proposalResponseDto);
-			processInfo.setStatus("Offer Generated");
+				LoanModificationInfo.class);
+		if (loanModificationInfo.getProposalDetails() == null) {
+			loanModificationInfo.setProposalDetails(proposalResponseDto);
+			loanModificationInfo.setStatus(LoanStatus.OFFER_GENERATED);
 			individualProcessUtilityService.setBusinessKey(delegateExecution,
 					loanNumber,
 					persistenceService.save(
 							individualProcessUtilityService.getBranchName(loanNumber),
 							qualifiedFilePath,
-							processInfo,
+							loanModificationInfo,
 							individualProcessUtilityService.commitMessage(delegateExecution, false)).getSha());
 		}
 		delegateExecution.removeVariable(proposalRequestVariableKey);
