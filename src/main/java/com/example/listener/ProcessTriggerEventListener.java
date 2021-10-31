@@ -1,6 +1,7 @@
 package com.example.listener;
 
 import com.example.workflow.model.ProcessInfo;
+import com.example.workflow.services.GenericUtilityService;
 import com.example.workflow.services.PersistenceService;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.extern.slf4j.Slf4j;
@@ -28,23 +29,34 @@ public class ProcessTriggerEventListener {
 	@Autowired
 	PersistenceService<ProcessInfo> persistenceService;
 
+	@Autowired
+	GenericUtilityService genericUtilityService;
+
 	@KafkaListener(topics = "loanReadyForRenewal", groupId = "group")
 	public void onMessage(String loanNumber) {
 		log.info("Received Loan # {}", loanNumber);
 		if (loanNumber.equals("START")) {
 			loans = new ArrayList<>();
+		} else if (loanNumber.equals("FIX")) {
+			loans = new ArrayList<>();
+			persistenceService.branches().forEach(b -> loans.add(
+					genericUtilityService.retrieveLoanNumber(
+							b.getName())));
+			startBurstRenewalProcess();
 		} else if (!loanNumber.equals("END")) {
 			loans.add(loanNumber);
 		} else {
-			persistenceService.branches().forEach(b -> loans.add(b.getName()));
-			ProcessEngines.getDefaultProcessEngine()
-					.getRuntimeService()
-					.createProcessInstanceByKey("burstRenewalProcess")
-					.setVariable(loansVariableKey, Variables.objectValue(loans)
-							.serializationDataFormat(Variables.SerializationDataFormats.JSON)
-							.create())
-					.execute();
-			loans = null;
+			startBurstRenewalProcess();
 		}
+	}
+
+	private void startBurstRenewalProcess() {
+		ProcessEngines.getDefaultProcessEngine()
+				.getRuntimeService()
+				.createProcessInstanceByKey("burstRenewalProcess")
+				.setVariable(loansVariableKey, Variables.objectValue(loans)
+						.serializationDataFormat(Variables.SerializationDataFormats.JSON)
+						.create())
+				.execute();
 	}
 }

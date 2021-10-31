@@ -10,6 +10,8 @@ import java.util.Locale;
 @Service
 public class GenericUtilityService {
 
+	public static final String BRANCH_NAME_PREFIX = "irpb/";
+	public static final String QUALIFIED_PATH_PREFIX = "ir/data/process/";
 	@Autowired
 	private String processBusinessKeyDelimiter;
 
@@ -31,7 +33,7 @@ public class GenericUtilityService {
 	}
 
 	public void setBusinessKey(DelegateExecution delegateExecution, String loanNumber, String processHead) {
-		 delegateExecution.getProcessInstance().setProcessBusinessKey(loanNumber
+		delegateExecution.getProcessInstance().setProcessBusinessKey(loanNumber
 				.concat(processBusinessKeyDelimiter)
 				.concat(processHead));
 	}
@@ -43,10 +45,20 @@ public class GenericUtilityService {
 				.concat(delegateExecution.getActivityInstanceId()).concat("]");
 	}
 
-	public String getQualifiedFilePath(String path, Class<?> c) {
-		return path.concat("/")
-				.concat(getFileNameInRepo(c).toLowerCase(Locale.ROOT)
-						.concat(".json"));
+	public String getQualifiedLoanFilePath(String path, Class<?> c) {
+		return QUALIFIED_PATH_PREFIX
+				.concat(path)
+				.concat("/")
+				.concat(getFileNameInRepo(c).toLowerCase(Locale.ROOT))
+				.concat(".json");
+	}
+
+	public String getBranchName(String loanNumber) {
+		return BRANCH_NAME_PREFIX.concat(loanNumber);
+	}
+
+	public String retrieveLoanNumber(String branchName) {
+		return branchName.replace(BRANCH_NAME_PREFIX, StringUtils.EMPTY);
 	}
 
 	private String getFileNameInRepo(Class<?> obj) {

@@ -30,10 +30,11 @@ public class GetLoanInfo implements JavaDelegate {
 				delegateExecution.getCurrentActivityName());
 		String loanNumber = genericUtilityService.loanNumber(delegateExecution);
 		LoanResponseDto loanResponseDto = loanInfoService.getLoan(loanNumber);
+		String qualifiedFilePath = genericUtilityService.getQualifiedLoanFilePath(
+				loanNumber,
+				ProcessInfo.class);
 		ProcessInfo processInfo = persistenceService.get(
-				genericUtilityService.getQualifiedFilePath(
-						loanNumber,
-						ProcessInfo.class),
+				qualifiedFilePath,
 				genericUtilityService.processInfoSha(delegateExecution),
 				ProcessInfo.class);
 		if (processInfo.getLoanDetails() == null) {
@@ -41,8 +42,8 @@ public class GetLoanInfo implements JavaDelegate {
 			genericUtilityService.setBusinessKey(delegateExecution,
 					loanNumber,
 					persistenceService.save(
-							processInfo.getLoanNumber(),
-							genericUtilityService.getQualifiedFilePath(processInfo.getLoanNumber(), ProcessInfo.class),
+							genericUtilityService.getBranchName(loanNumber),
+							qualifiedFilePath,
 							processInfo,
 							genericUtilityService.commitMessage(delegateExecution, false)).getSha());
 		}

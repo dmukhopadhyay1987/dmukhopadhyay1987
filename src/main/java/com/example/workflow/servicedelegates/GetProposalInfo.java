@@ -41,9 +41,10 @@ public class GetProposalInfo implements JavaDelegate {
 						.getVariable(proposalRequestVariableKey));
 		delegateExecution.setVariable(proposalResponseVariableKey,
 				proposalResponseDto);
-		ProcessInfo processInfo = persistenceService.get(genericUtilityService.getQualifiedFilePath(
-						loanNumber,
-						ProcessInfo.class),
+		String qualifiedFilePath = genericUtilityService.getQualifiedLoanFilePath(
+				loanNumber,
+				ProcessInfo.class);
+		ProcessInfo processInfo = persistenceService.get(qualifiedFilePath,
 				genericUtilityService.processInfoSha(delegateExecution),
 				ProcessInfo.class);
 		if (processInfo.getProposalDetails() == null) {
@@ -52,8 +53,8 @@ public class GetProposalInfo implements JavaDelegate {
 			genericUtilityService.setBusinessKey(delegateExecution,
 					loanNumber,
 					persistenceService.save(
-							processInfo.getLoanNumber(),
-							genericUtilityService.getQualifiedFilePath(processInfo.getLoanNumber(), ProcessInfo.class),
+							genericUtilityService.getBranchName(loanNumber),
+							qualifiedFilePath,
 							processInfo,
 							genericUtilityService.commitMessage(delegateExecution, false)).getSha());
 		}

@@ -24,18 +24,17 @@ public class RenewLoan implements JavaDelegate {
 		log.info("Inside >>> {}",
 				delegateExecution.getCurrentActivityName());
 		String loanNumber = genericUtilityService.loanNumber(delegateExecution);
+		String qualifiedFilePath = genericUtilityService.getQualifiedLoanFilePath(loanNumber, ProcessInfo.class);
 		ProcessInfo processInfo = persistenceService.get(
-				genericUtilityService.getQualifiedFilePath(
-						loanNumber,
-						ProcessInfo.class),
+				qualifiedFilePath,
 				genericUtilityService.processInfoSha(delegateExecution),
 				ProcessInfo.class);
 		processInfo.setStatus("Renewed");
 		genericUtilityService.setBusinessKey(delegateExecution,
 				loanNumber,
 				persistenceService.save(
-						processInfo.getLoanNumber(),
-						genericUtilityService.getQualifiedFilePath(processInfo.getLoanNumber(), ProcessInfo.class),
+						genericUtilityService.getBranchName(loanNumber),
+						qualifiedFilePath,
 						processInfo,
 						genericUtilityService.commitMessage(delegateExecution, false)).getSha());
 	}

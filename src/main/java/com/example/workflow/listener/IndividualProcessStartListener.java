@@ -45,8 +45,8 @@ public class IndividualProcessStartListener implements ExecutionListener {
 		genericUtilityService.setBusinessKey(delegateExecution,
 				loanNumber,
 				persistenceService.save(
-						processInfo.getLoanNumber(),
-						genericUtilityService.getQualifiedFilePath(processInfo.getLoanNumber(), ProcessInfo.class),
+						genericUtilityService.getBranchName(loanNumber),
+						genericUtilityService.getQualifiedLoanFilePath(loanNumber, ProcessInfo.class),
 						processInfo,
 						genericUtilityService.commitMessage(delegateExecution, false)).getSha());
 	}

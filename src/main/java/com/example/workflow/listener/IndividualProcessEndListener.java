@@ -37,22 +37,27 @@ public class IndividualProcessEndListener implements ExecutionListener {
 		log.info("Inside >>> {}",
 				delegateExecution.getCurrentActivityName());
 		String loanNumber = genericUtilityService.loanNumber(delegateExecution);
-		ProcessInfo processInfo = persistenceService.get(genericUtilityService.getQualifiedFilePath(loanNumber, ProcessInfo.class),
+		String qualifiedFilePath = genericUtilityService.getQualifiedLoanFilePath(
+				loanNumber,
+				ProcessInfo.class);
+		ProcessInfo processInfo = persistenceService.get(qualifiedFilePath,
 				genericUtilityService.processInfoSha(delegateExecution),
 				ProcessInfo.class);
 		processInfo.setEndDateTime(LocalDateTime.now().format(
 				DateTimeFormatter.ISO_DATE_TIME));
-		processInfo.setHistory(persistenceService.history(processInfo.getLoanNumber(),
-						c -> c.getCommitDetails().getMessage().contains(processInfo.getLoanNumber()),
+		processInfo.setHistory(persistenceService.history(loanNumber,
+						c -> c.getCommitDetails().getMessage().contains(loanNumber),
 						ProcessInfo.class)
 				.stream().peek(h -> h.setHistory(null))
 				.collect(Collectors.toList()));
 		persistenceService.save(
-				processInfo.getLoanNumber(),
-				genericUtilityService.getQualifiedFilePath(processInfo.getLoanNumber(), ProcessInfo.class),
+				genericUtilityService.getBranchName(loanNumber),
+				qualifiedFilePath,
 				processInfo,
 				genericUtilityService.commitMessage(delegateExecution, false));
-		persistenceService.merge(processInfo.getLoanNumber(), genericUtilityService.commitMessage(delegateExecution, true));
+		persistenceService.merge(
+				genericUtilityService.getBranchName(loanNumber),
+				genericUtilityService.commitMessage(delegateExecution, true));
 		delegateExecution.removeVariable(loanVariableKey);
 		delegateExecution.removeVariable(proposalResponseVariableKey);
 	}

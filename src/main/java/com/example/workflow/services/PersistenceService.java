@@ -32,6 +32,9 @@ import java.util.stream.Collectors;
 @EnableCaching
 public class PersistenceService<T> {
 
+	public static final String TREE = "tree";
+	public static final String BLOB = "blob";
+	public static final String BLOB_MODE = "100644";
 	@Autowired
 	private GitFeign gitClient;
 	@Autowired
@@ -93,15 +96,11 @@ public class PersistenceService<T> {
 		Reference branch = branch(branchName);
 		blobRequest.setContent(objectMapper.writeValueAsString(payload));
 		Commit lastCommit = commit(branch.getObject().getSha());
-		List<TreeDetail> modifiedBaseTrees = tree(lastCommit.getCommitDetails().getTree().getSha())
-				.getTreeDetail()
-				.stream().filter(t -> t.getType().equals("tree") && !path.contains(t.getPath()))
-				.collect(Collectors.toList());
-		modifiedBaseTrees.add(new TreeDetail(gitClient.createBlob(blobRequest).getSha(),
+		treeRequest.setBaseTree(tree(lastCommit.getCommitDetails().getTree().getSha()).getSha());
+		treeRequest.setTree(List.of(new TreeDetail(gitClient.createBlob(blobRequest).getSha(),
 				path,
-				"blob",
-				"100644"));
-		treeRequest.setTree(modifiedBaseTrees);
+				BLOB,
+				BLOB_MODE)));
 		Tree tree = gitClient.createTree(treeRequest);
 
 		commitRequest.setTree(tree.getSha());
@@ -117,15 +116,12 @@ public class PersistenceService<T> {
 	@SneakyThrows
 	public T get(String path, String sha, Class<T> c) {
 		log.info("GET content of '{}' and cast to {}", path, c.getSimpleName());
-		return objectMapper.readValue(Base64.getDecoder().decode(tree(commit(sha).getCommitDetails().getTree().getSha())
-				.getTreeDetail().stream()
-				.filter(t -> path.contains(t.getPath()))
-				.map(td -> tree(td.getSha()))
-				.map(bt -> blob(bt.getTreeDetail().stream().findFirst().orElseThrow().getSha()))
+		return decode(commit(sha)
+				.getFiles()
+				.stream().filter(f -> path.contains(f.getFilename()))
+				.map(f -> blob(f.getSha()))
 				.findFirst().orElseThrow()
-				.getBase64content()
-				.replace("\n", "")
-				.replace("\r", "")), c);
+				.getBase64content(), c);
 	}
 
 	public void merge(String branchName, String message) {
@@ -148,16 +144,19 @@ public class PersistenceService<T> {
 				.filter(c1 -> c1.getCommitDetails().getMessage().contains("Merge"))
 				.map(c2 -> commit(c2.getSha()))
 				.filter(c3 -> c3.getFiles() != null && !c3.getFiles().isEmpty())
-				.map(c4 -> blob(c4.getFiles().stream().findFirst().orElseThrow()
-						.getSha()).getBase64content()
-						.replace("\n", "")
-						.replace("\r", ""))
+				.map(c4 -> blob(c4.getFiles()
+						.stream()
+						.filter(f -> path.contains(f.getFilename()))
+						.findFirst().orElseThrow()
+						.getSha()).getBase64content())
 				.map(coded -> decode(coded, c))
 				.collect(Collectors.toList());
 	}
 
 	@SneakyThrows
 	private T decode(String s, Class<T> c) {
-		return objectMapper.readValue(Base64.getDecoder().decode(s), c);
+		return objectMapper.readValue(Base64.getDecoder().decode(
+				s.replace("\n", "")
+						.replace("\r", "")), c);
 	}
 }
