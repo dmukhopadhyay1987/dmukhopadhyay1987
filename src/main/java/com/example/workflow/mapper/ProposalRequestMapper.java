@@ -39,5 +39,6 @@ public class ProposalRequestMapper implements JavaDelegate {
 				LoanModificationInfo.class).getLoanDetails();
 		ProposalRequestDto proposalRequestDto = dozerBeanMapper.map(loanResponseDto, ProposalRequestDto.class);
 		delegateExecution.setVariable(proposalRequestVariableKey, proposalRequestDto);
+		log.info("Mapped");
 	}
 }

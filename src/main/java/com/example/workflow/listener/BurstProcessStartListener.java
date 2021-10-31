@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 @Component
@@ -38,7 +39,8 @@ public class BurstProcessStartListener implements ExecutionListener {
 						dateTime,
 						ReportInfo.class),
 				ReportInfo.builder()
-						.startDateTime(dateTime)
+						.startDateTime(LocalDateTime.now()
+								.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
 						.build(),
 				burstProcessUtilityService.commitMessage(
 						delegateExecution,
