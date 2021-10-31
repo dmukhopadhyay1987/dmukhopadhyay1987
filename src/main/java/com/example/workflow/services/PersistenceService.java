@@ -98,7 +98,7 @@ public class PersistenceService<T> {
 		Reference branch = branch(branchName);
 		blobRequest.setContent(objectMapper.writeValueAsString(payload));
 		Commit lastCommit = commit(branch.getObject().getSha());
-		treeRequest.setBaseTree(tree(lastCommit.getCommitDetails().getTree().getSha()).getSha());
+		treeRequest.setBaseTree(lastCommit.getSha());
 		treeRequest.setTree(List.of(new TreeDetail(gitClient.createBlob(blobRequest).getSha(),
 				path,
 				BLOB,
@@ -116,9 +116,9 @@ public class PersistenceService<T> {
 	}
 
 	@SneakyThrows
-	public T get(String path, String sha, Class<T> c) {
+	public T get(String path, String branchName, Class<T> c) {
 		log.info("GET content of '{}' and cast to {}", path, c.getSimpleName());
-		return decode(commit(sha)
+		return decode(commit(branch(branchName).getObject().getSha())
 				.getFiles()
 				.stream().filter(f -> path.contains(f.getFilename()))
 				.map(f -> blob(f.getSha()))

@@ -31,14 +31,16 @@ public class IndividualProcessStartListener implements ExecutionListener {
 		log.info("Inside >>> {}",
 				delegateExecution.getCurrentActivityName());
 		String loanNumber = (String) delegateExecution.getVariable(loanVariableKey);
-
+		if (loanNumber.contains("run_")) {
+			throw new RuntimeException();
+		}
 		individualProcessUtilityService.setBusinessKey(delegateExecution,
-				loanNumber,
-				persistenceService.save(
+				loanNumber);
+		persistenceService.save(
 						individualProcessUtilityService.getBranchName(loanNumber),
 						individualProcessUtilityService.getQualifiedLoanFilePath(loanNumber, LoanModificationInfo.class),
 						getLoanModification(loanNumber),
-						individualProcessUtilityService.commitMessage(delegateExecution, false)).getSha());
+						individualProcessUtilityService.commitMessage(delegateExecution, false));
 	}
 
 	private LoanModificationInfo getLoanModification(String loanNumber) {

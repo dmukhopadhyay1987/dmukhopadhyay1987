@@ -33,19 +33,18 @@ public class GetLoanInfo implements JavaDelegate {
 		String qualifiedFilePath = individualProcessUtilityService.getQualifiedLoanFilePath(
 				loanNumber,
 				LoanModificationInfo.class);
+		String branchName = individualProcessUtilityService.getBranchName(loanNumber);
 		LoanModificationInfo loanModificationInfo = persistenceService.get(
 				qualifiedFilePath,
-				individualProcessUtilityService.processInfoSha(delegateExecution),
+				branchName,
 				LoanModificationInfo.class);
 		if (loanModificationInfo.getLoanDetails() == null) {
 			loanModificationInfo.setLoanDetails(loanResponseDto);
-			individualProcessUtilityService.setBusinessKey(delegateExecution,
-					loanNumber,
-					persistenceService.save(
-							individualProcessUtilityService.getBranchName(loanNumber),
-							qualifiedFilePath,
-							loanModificationInfo,
-							individualProcessUtilityService.commitMessage(delegateExecution, false)).getSha());
+			persistenceService.save(
+					branchName,
+					qualifiedFilePath,
+					loanModificationInfo,
+					individualProcessUtilityService.commitMessage(delegateExecution, false));
 		}
 	}
 }

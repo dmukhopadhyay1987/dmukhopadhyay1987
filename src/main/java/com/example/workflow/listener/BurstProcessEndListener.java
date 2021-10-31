@@ -38,6 +38,9 @@ public class BurstProcessEndListener implements ExecutionListener {
 	@Autowired
 	IndividualProcessUtilityService individualProcessUtilityService;
 
+	@Autowired
+	String reportShaVariableKey;
+
 	@Override
 	public void notify(DelegateExecution delegateExecution) {
 		log.info("Inside >>> {}",
@@ -47,7 +50,7 @@ public class BurstProcessEndListener implements ExecutionListener {
 		ReportInfo reportInfo = burstPersistenceService.get(burstProcessUtilityService.getQualifiedReportFilePath(
 						processId,
 						ReportInfo.class),
-				burstProcessUtilityService.reportInfoSha(delegateExecution),
+				burstProcessUtilityService.getBranchName(processId),
 				ReportInfo.class);
 		burstPersistenceService.save(burstProcessUtilityService.getBranchName(processId),
 				burstProcessUtilityService.getQualifiedReportFilePath(processId, ReportInfo.class),

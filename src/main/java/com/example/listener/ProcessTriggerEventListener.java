@@ -51,12 +51,14 @@ public class ProcessTriggerEventListener {
 	}
 
 	private void startBurstRenewalProcess() {
-		ProcessEngines.getDefaultProcessEngine()
-				.getRuntimeService()
-				.createProcessInstanceByKey("burstRenewalProcess")
-				.setVariable(loansVariableKey, Variables.objectValue(loans)
-						.serializationDataFormat(Variables.SerializationDataFormats.JSON)
-						.create())
-				.execute();
+		if(loans!= null && !loans.isEmpty()) {
+			ProcessEngines.getDefaultProcessEngine()
+					.getRuntimeService()
+					.createProcessInstanceByKey("burstRenewalProcess")
+					.setVariable(loansVariableKey, Variables.objectValue(loans)
+							.serializationDataFormat(Variables.SerializationDataFormats.JSON)
+							.create())
+					.execute();
+		}
 	}
 }

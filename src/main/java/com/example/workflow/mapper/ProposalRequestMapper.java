@@ -35,7 +35,7 @@ public class ProposalRequestMapper implements JavaDelegate {
 		String loanNumber = individualProcessUtilityService.loanNumber(delegateExecution);
 		LoanResponseDto loanResponseDto = persistenceService.get(
 				individualProcessUtilityService.getQualifiedLoanFilePath(loanNumber, LoanModificationInfo.class),
-				individualProcessUtilityService.processInfoSha(delegateExecution),
+				individualProcessUtilityService.getBranchName(loanNumber),
 				LoanModificationInfo.class).getLoanDetails();
 		ProposalRequestDto proposalRequestDto = dozerBeanMapper.map(loanResponseDto, ProposalRequestDto.class);
 		delegateExecution.setVariable(proposalRequestVariableKey, proposalRequestDto);

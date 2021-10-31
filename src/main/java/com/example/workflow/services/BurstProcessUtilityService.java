@@ -10,33 +10,17 @@ import java.util.Locale;
 @Service
 public class BurstProcessUtilityService {
 
-	public static final String BRANCH_NAME_PREFIX = "irpb/";
+	public static final String BRANCH_NAME_PREFIX = "irpb/run_";
 	public static final String QUALIFIED_PATH_PREFIX = "ir/data/report/";
 
 	@Autowired
-	String reportVariableKey;
+	String reportBranchVariableKey;
 
 	@Autowired
-	private String processBusinessKeyDelimiter;
+	String reportShaVariableKey;
 
 	public String processId(DelegateExecution delegateExecution) {
-		return getBusinessKey(delegateExecution) != null
-				? getBusinessKey(delegateExecution).split(processBusinessKeyDelimiter)[0]
-				: (String) delegateExecution.getVariable(reportVariableKey);
-	}
-
-	public String reportInfoSha(DelegateExecution delegateExecution) {
-		return getBusinessKey(delegateExecution).split(processBusinessKeyDelimiter)[1];
-	}
-
-	private String getBusinessKey(DelegateExecution delegateExecution) {
-		return delegateExecution.getProcessInstance().getProcessBusinessKey();
-	}
-
-	public void setBusinessKey(DelegateExecution delegateExecution, String processId, String processHead) {
-		delegateExecution.getProcessInstance().setProcessBusinessKey(processId
-				.concat(processBusinessKeyDelimiter)
-				.concat(processHead));
+		return (String) delegateExecution.getVariable(reportBranchVariableKey);
 	}
 
 	public String commitMessage(DelegateExecution delegateExecution, boolean mergeCommit) {

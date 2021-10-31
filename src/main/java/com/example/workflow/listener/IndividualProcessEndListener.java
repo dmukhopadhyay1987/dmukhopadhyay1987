@@ -41,7 +41,7 @@ public class IndividualProcessEndListener implements ExecutionListener {
 				loanNumber,
 				LoanModificationInfo.class);
 		LoanModificationInfo loanModificationInfo = persistenceService.get(qualifiedFilePath,
-				individualProcessUtilityService.processInfoSha(delegateExecution),
+				individualProcessUtilityService.getBranchName(loanNumber),
 				LoanModificationInfo.class);
 		loanModificationInfo.setEndDateTime(LocalDateTime.now().format(
 				DateTimeFormatter.ISO_DATE_TIME));

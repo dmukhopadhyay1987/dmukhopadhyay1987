@@ -16,7 +16,7 @@ import java.time.format.DateTimeFormatter;
 @Slf4j
 public class BurstProcessStartListener implements ExecutionListener {
 
-	public static final String DATE_TIME_FORMAT = "YYYYMMDD";
+	public static final String DATE_TIME_FORMAT = "yyyyMMdd";
 	@Autowired
 	PersistenceService<ReportInfo> persistenceService;
 
@@ -24,7 +24,7 @@ public class BurstProcessStartListener implements ExecutionListener {
 	BurstProcessUtilityService burstProcessUtilityService;
 
 	@Autowired
-	String reportVariableKey;
+	String reportBranchVariableKey;
 
 	@Override
 	public void notify(DelegateExecution delegateExecution) {
@@ -32,18 +32,16 @@ public class BurstProcessStartListener implements ExecutionListener {
 				delegateExecution.getCurrentActivityName());
 		String dateTime = LocalDate.now().format(
 				DateTimeFormatter.ofPattern(DATE_TIME_FORMAT));
-		delegateExecution.setVariable(reportVariableKey, dateTime);
-		burstProcessUtilityService.setBusinessKey(delegateExecution,
-				dateTime,
-				persistenceService.save(burstProcessUtilityService.getBranchName(dateTime),
-						burstProcessUtilityService.getQualifiedReportFilePath(
-								dateTime,
-								ReportInfo.class),
-						ReportInfo.builder()
-								.startDateTime(dateTime)
-								.build(),
-						burstProcessUtilityService.commitMessage(
-								delegateExecution,
-								false)).getSha());
+		delegateExecution.setVariable(reportBranchVariableKey, dateTime);
+		persistenceService.save(burstProcessUtilityService.getBranchName(dateTime),
+				burstProcessUtilityService.getQualifiedReportFilePath(
+						dateTime,
+						ReportInfo.class),
+				ReportInfo.builder()
+						.startDateTime(dateTime)
+						.build(),
+				burstProcessUtilityService.commitMessage(
+						delegateExecution,
+						false));
 	}
 }
