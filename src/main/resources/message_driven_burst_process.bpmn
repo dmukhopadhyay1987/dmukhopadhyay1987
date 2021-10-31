@@ -4,115 +4,103 @@
     <bpmn:startEvent id="startRenewalBatch" name="Start Renewal Batch">
       <bpmn:outgoing>Flow_0l81tk7</bpmn:outgoing>
     </bpmn:startEvent>
-    <bpmn:sequenceFlow id="Flow_0l81tk7" sourceRef="startRenewalBatch" targetRef="viewLoans" />
+    <bpmn:sequenceFlow id="Flow_0l81tk7" sourceRef="startRenewalBatch" targetRef="parallelLoanProcessor" />
     <bpmn:endEvent id="Event_1n71piu">
       <bpmn:incoming>Flow_1sanum2</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:sequenceFlow id="Flow_1sanum2" sourceRef="parallelLoanProcessor" targetRef="Event_1n71piu" />
     <bpmn:transaction id="parallelLoanProcessor" name="Parallel Loan Processor">
-      <bpmn:incoming>Flow_1bzcs9c</bpmn:incoming>
+      <bpmn:incoming>Flow_0l81tk7</bpmn:incoming>
       <bpmn:outgoing>Flow_1sanum2</bpmn:outgoing>
-      <bpmn:multiInstanceLoopCharacteristics isSequential="true" camunda:collection="loanNumbers" camunda:elementVariable="loanNumber" />
-      <bpmn:startEvent id="startRenewal" name="Start Renewal">
-        <bpmn:extensionElements>
-          <camunda:executionListener delegateExpression="${renewalProcessStartListener}" event="start" />
-        </bpmn:extensionElements>
-        <bpmn:outgoing>Flow_0v8501r</bpmn:outgoing>
-      </bpmn:startEvent>
+      <bpmn:multiInstanceLoopCharacteristics camunda:collection="loanNumbers" camunda:elementVariable="loanNumber" />
+      <bpmn:serviceTask id="mapLoanToProposalReq" name="Proposal Request Mapper" camunda:delegateExpression="${proposalRequestMapper}">
+        <bpmn:incoming>Flow_0y32hgs</bpmn:incoming>
+        <bpmn:outgoing>Flow_0j3zk5w</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:serviceTask id="getProposalInfo" name="Get Proposal Info" camunda:delegateExpression="${getProposalInfo}">
+        <bpmn:incoming>Flow_0j3zk5w</bpmn:incoming>
+        <bpmn:outgoing>Flow_0bd7jvh</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:serviceTask id="getLoanInfo" name="Get Loan Info" camunda:delegateExpression="${getLoanInfo}">
+        <bpmn:incoming>Flow_0v8501r</bpmn:incoming>
+        <bpmn:outgoing>Flow_0y32hgs</bpmn:outgoing>
+      </bpmn:serviceTask>
       <bpmn:endEvent id="endRenewal" name="End Renewal">
         <bpmn:extensionElements>
           <camunda:executionListener delegateExpression="${renewalProcessEndListener}" event="start" />
         </bpmn:extensionElements>
         <bpmn:incoming>Flow_0bd7jvh</bpmn:incoming>
       </bpmn:endEvent>
-      <bpmn:serviceTask id="getLoanInfo" name="Get Loan Info" camunda:delegateExpression="${getLoanInfo}">
-        <bpmn:incoming>Flow_0v8501r</bpmn:incoming>
-        <bpmn:outgoing>Flow_0y32hgs</bpmn:outgoing>
-      </bpmn:serviceTask>
-      <bpmn:serviceTask id="getProposalInfo" name="Get Proposal Info" camunda:delegateExpression="${getProposalInfo}">
-        <bpmn:incoming>Flow_0j3zk5w</bpmn:incoming>
-        <bpmn:outgoing>Flow_0bd7jvh</bpmn:outgoing>
-      </bpmn:serviceTask>
-      <bpmn:serviceTask id="mapLoanToProposalReq" name="Proposal Request Mapper" camunda:delegateExpression="${proposalRequestMapper}">
-        <bpmn:incoming>Flow_0y32hgs</bpmn:incoming>
-        <bpmn:outgoing>Flow_0j3zk5w</bpmn:outgoing>
-      </bpmn:serviceTask>
-      <bpmn:sequenceFlow id="Flow_0v8501r" sourceRef="startRenewal" targetRef="getLoanInfo" />
-      <bpmn:sequenceFlow id="Flow_0bd7jvh" sourceRef="getProposalInfo" targetRef="endRenewal" />
-      <bpmn:sequenceFlow id="Flow_0y32hgs" sourceRef="getLoanInfo" targetRef="mapLoanToProposalReq" />
+      <bpmn:startEvent id="startRenewal" name="Start Renewal">
+        <bpmn:extensionElements>
+          <camunda:executionListener delegateExpression="${renewalProcessStartListener}" event="start" />
+        </bpmn:extensionElements>
+        <bpmn:outgoing>Flow_0v8501r</bpmn:outgoing>
+      </bpmn:startEvent>
       <bpmn:sequenceFlow id="Flow_0j3zk5w" sourceRef="mapLoanToProposalReq" targetRef="getProposalInfo" />
+      <bpmn:sequenceFlow id="Flow_0y32hgs" sourceRef="getLoanInfo" targetRef="mapLoanToProposalReq" />
+      <bpmn:sequenceFlow id="Flow_0bd7jvh" sourceRef="getProposalInfo" targetRef="endRenewal" />
+      <bpmn:sequenceFlow id="Flow_0v8501r" sourceRef="startRenewal" targetRef="getLoanInfo" />
     </bpmn:transaction>
-    <bpmn:sequenceFlow id="Flow_1bzcs9c" sourceRef="viewLoans" targetRef="parallelLoanProcessor" />
-    <bpmn:userTask id="viewLoans" name="View Loans">
-      <bpmn:incoming>Flow_0l81tk7</bpmn:incoming>
-      <bpmn:outgoing>Flow_1bzcs9c</bpmn:outgoing>
-    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_1sanum2" sourceRef="parallelLoanProcessor" targetRef="Event_1n71piu" />
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="burstRenewalProcess">
       <bpmndi:BPMNEdge id="Flow_0l81tk7_di" bpmnElement="Flow_0l81tk7" bioc:stroke="#43a047" color:border-color="#43a047">
         <di:waypoint x="745" y="148" />
-        <di:waypoint x="745" y="290" />
+        <di:waypoint x="745" y="320" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1sanum2_di" bpmnElement="Flow_1sanum2" bioc:stroke="#43a047" color:border-color="#43a047">
-        <di:waypoint x="745" y="650" />
-        <di:waypoint x="745" y="752" />
+        <di:waypoint x="745" y="480" />
+        <di:waypoint x="745" y="642" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1bzcs9c_di" bpmnElement="Flow_1bzcs9c" bioc:stroke="#43a047" color:border-color="#43a047">
-        <di:waypoint x="745" y="370" />
-        <di:waypoint x="745" y="490" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="Event_1n71piu_di" bpmnElement="Event_1n71piu" bioc:stroke="#43a047" bioc:fill="#c8e6c9" color:background-color="#c8e6c9" color:border-color="#43a047">
-        <dc:Bounds x="727" y="752" width="36" height="36" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_10arfe5_di" bpmnElement="viewLoans" bioc:stroke="#fb8c00" bioc:fill="#ffe0b2" color:background-color="#ffe0b2" color:border-color="#fb8c00">
-        <dc:Bounds x="695" y="290" width="100" height="80" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="startRenewalBatch" bioc:stroke="#43a047" bioc:fill="#c8e6c9" color:background-color="#c8e6c9" color:border-color="#43a047">
         <dc:Bounds x="727" y="112" width="36" height="36" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="710" y="82" width="70" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1n71piu_di" bpmnElement="Event_1n71piu" bioc:stroke="#43a047" bioc:fill="#c8e6c9" color:background-color="#c8e6c9" color:border-color="#43a047">
+        <dc:Bounds x="727" y="642" width="36" height="36" />
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0rok2gn_di" bpmnElement="parallelLoanProcessor" isExpanded="true" bioc:stroke="#43a047" bioc:fill="#c8e6c9" color:background-color="#c8e6c9" color:border-color="#43a047">
-        <dc:Bounds x="160" y="490" width="1170" height="160" />
+        <dc:Bounds x="160" y="320" width="1170" height="160" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_0v8501r_di" bpmnElement="Flow_0v8501r" bioc:stroke="#8e24aa" color:border-color="#8e24aa">
-        <di:waypoint x="248" y="570" />
-        <di:waypoint x="510" y="570" />
+        <di:waypoint x="248" y="400" />
+        <di:waypoint x="510" y="400" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0bd7jvh_di" bpmnElement="Flow_0bd7jvh" bioc:stroke="#8e24aa" color:border-color="#8e24aa">
-        <di:waypoint x="980" y="570" />
-        <di:waypoint x="1252" y="570" />
+        <di:waypoint x="980" y="400" />
+        <di:waypoint x="1252" y="400" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0y32hgs_di" bpmnElement="Flow_0y32hgs" bioc:stroke="#8e24aa" color:border-color="#8e24aa">
-        <di:waypoint x="610" y="570" />
-        <di:waypoint x="690" y="570" />
+        <di:waypoint x="610" y="400" />
+        <di:waypoint x="690" y="400" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0j3zk5w_di" bpmnElement="Flow_0j3zk5w" bioc:stroke="#8e24aa" color:border-color="#8e24aa">
-        <di:waypoint x="790" y="570" />
-        <di:waypoint x="880" y="570" />
+        <di:waypoint x="790" y="400" />
+        <di:waypoint x="880" y="400" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Event_1e1utlf_di" bpmnElement="startRenewal" bioc:stroke="#8e24aa" bioc:fill="#e1bee7" color:background-color="#e1bee7" color:border-color="#8e24aa">
-        <dc:Bounds x="212" y="552" width="36" height="36" />
+        <dc:Bounds x="212" y="382" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="196" y="595" width="70" height="14" />
+          <dc:Bounds x="196" y="425" width="70" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_0jtb79y_di" bpmnElement="endRenewal" bioc:stroke="#8e24aa" bioc:fill="#e1bee7" color:background-color="#e1bee7" color:border-color="#8e24aa">
-        <dc:Bounds x="1252" y="552" width="36" height="36" />
+        <dc:Bounds x="1252" y="382" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1237" y="595" width="66" height="14" />
+          <dc:Bounds x="1237" y="425" width="66" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0xp3ins_di" bpmnElement="getLoanInfo" bioc:stroke="#8e24aa" bioc:fill="#e1bee7" color:background-color="#e1bee7" color:border-color="#8e24aa">
-        <dc:Bounds x="510" y="530" width="100" height="80" />
+        <dc:Bounds x="510" y="360" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_16k6y27_di" bpmnElement="getProposalInfo" bioc:stroke="#8e24aa" bioc:fill="#e1bee7" color:background-color="#e1bee7" color:border-color="#8e24aa">
-        <dc:Bounds x="880" y="530" width="100" height="80" />
+        <dc:Bounds x="880" y="360" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_16ytvyh_di" bpmnElement="mapLoanToProposalReq" bioc:stroke="#8e24aa" bioc:fill="#e1bee7" color:background-color="#e1bee7" color:border-color="#8e24aa">
-        <dc:Bounds x="690" y="530" width="100" height="80" />
+        <dc:Bounds x="690" y="360" width="100" height="80" />
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

@@ -44,17 +44,17 @@
         <di:waypoint x="910" y="117" />
         <di:waypoint x="1182" y="117" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="SequenceFlow_1fp17al_di" bpmnElement="SequenceFlow_1fp17al">
+      <bpmndi:BPMNEdge id="SequenceFlow_1fp17al_di" bpmnElement="SequenceFlow_1fp17al" bioc:stroke="#8e24aa" color:border-color="#8e24aa">
         <di:waypoint x="178" y="117" />
         <di:waypoint x="440" y="117" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="startRenewal" bioc:stroke="#000000" bioc:fill="#ffffff" color:background-color="#ffffff" color:border-color="#000000">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="startRenewal" bioc:stroke="#8e24aa" bioc:fill="#e1bee7" color:background-color="#e1bee7" color:border-color="#8e24aa">
         <dc:Bounds x="142" y="99" width="36" height="36" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="126" y="142" width="70" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="EndEvent_0x6ir2l_di" bpmnElement="endRenewal" bioc:stroke="#000000" bioc:fill="#ffffff" color:background-color="#ffffff" color:border-color="#000000">
+      <bpmndi:BPMNShape id="EndEvent_0x6ir2l_di" bpmnElement="endRenewal" bioc:stroke="#8e24aa" bioc:fill="#e1bee7" color:background-color="#e1bee7" color:border-color="#8e24aa">
         <dc:Bounds x="1182" y="99" width="36" height="36" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="1167" y="142" width="66" height="14" />
