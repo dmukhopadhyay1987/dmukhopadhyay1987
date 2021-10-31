@@ -45,7 +45,7 @@ public class IndividualProcessEndListener implements ExecutionListener {
 				ProcessInfo.class);
 		processInfo.setEndDateTime(LocalDateTime.now().format(
 				DateTimeFormatter.ISO_DATE_TIME));
-		processInfo.setHistory(persistenceService.history(loanNumber,
+		processInfo.setHistory(persistenceService.history(qualifiedFilePath,
 						c -> c.getCommitDetails().getMessage().contains(loanNumber),
 						ProcessInfo.class)
 				.stream().peek(h -> h.setHistory(null))
