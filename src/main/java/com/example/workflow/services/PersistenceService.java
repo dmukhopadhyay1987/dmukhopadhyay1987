@@ -10,6 +10,7 @@ import com.example.feign.model.TreeRequest;
 import com.example.vo.Blob;
 import com.example.vo.Branch;
 import com.example.vo.Commit;
+import com.example.vo.File;
 import com.example.vo.Reference;
 import com.example.vo.Tree;
 import com.example.vo.TreeDetail;
@@ -59,7 +60,7 @@ public class PersistenceService<T> {
 	@Cacheable(cacheNames = "blobs", keyGenerator = "keyGen")
 	private Blob blob(String sha) {
 		log.debug("GET blob {}", sha);
-		return gitClient.blob(sha).orElse(null);
+		return gitClient.blob(sha).orElseThrow();
 	}
 
 	@Cacheable(cacheNames = "tree", keyGenerator = "keyGen")
@@ -167,12 +168,17 @@ public class PersistenceService<T> {
 				.map(c2 -> commit(c2.getSha()))
 				.filter(c3 -> c3.getFiles() != null && !c3.getFiles().isEmpty())
 				.collect(Collectors.toList())
-				.forEach(c4 -> historyMap.put(c4.getCommitDetails().getCommitter().getDate(),
-						decode(blob(c4.getFiles()
-								.stream()
-								.filter(f -> path.contains(f.getFilename()))
-								.findFirst().orElseThrow()
-								.getSha()).getBase64content(), c)));
+				.forEach(c4 -> {
+					File file = c4.getFiles()
+							.stream()
+							.filter(f -> path.contains(f.getFilename()))
+							.findFirst().orElseGet(null);
+					if (file != null) {
+						String date = c4.getCommitDetails().getCommitter().getDate();
+						historyMap.put(date,
+								decode(blob(file.getSha()).getBase64content(), c));
+					}
+				});
 		return historyMap;
 	}
 
