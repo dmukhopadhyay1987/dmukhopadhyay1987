@@ -17,7 +17,7 @@ import java.time.format.DateTimeFormatter;
 @Slf4j
 public class BurstProcessStartListener implements ExecutionListener {
 
-	public static final String DATE_TIME_FORMAT = "yyyyMMdd";
+	public static final String DATE_TIME_FORMAT = "yyyyMMdd/HHmm";
 	@Autowired
 	PersistenceService<ReportInfo> persistenceService;
 
@@ -31,7 +31,7 @@ public class BurstProcessStartListener implements ExecutionListener {
 	public void notify(DelegateExecution delegateExecution) {
 		log.info("Inside >>> {}",
 				delegateExecution.getCurrentActivityName());
-		String dateTime = LocalDate.now().format(
+		String dateTime = LocalDateTime.now().format(
 				DateTimeFormatter.ofPattern(DATE_TIME_FORMAT));
 		delegateExecution.setVariable(reportBranchVariableKey, dateTime);
 		persistenceService.save(burstProcessUtilityService.getBranchName(dateTime),

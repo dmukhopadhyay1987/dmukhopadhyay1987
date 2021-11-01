@@ -13,6 +13,8 @@ import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,9 +36,6 @@ public class BurstProcessEndListener implements ExecutionListener {
 
 	@Autowired
 	IndividualProcessUtilityService individualProcessUtilityService;
-
-	@Autowired
-	String reportShaVariableKey;
 
 	@Override
 	public void notify(DelegateExecution delegateExecution) {
@@ -68,7 +67,10 @@ public class BurstProcessEndListener implements ExecutionListener {
 												.collect(Collectors.toList()))
 										.build()
 								).collect(Collectors.toList())
-						).build(),
+						).endDateTime(
+								LocalDateTime.now()
+										.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
+						.build(),
 				burstProcessUtilityService.commitMessage(delegateExecution, false));
 		burstPersistenceService.merge(burstProcessUtilityService.getBranchName(
 						burstProcessUtilityService.processId(

@@ -16,9 +16,6 @@ public class BurstProcessUtilityService {
 	@Autowired
 	String reportBranchVariableKey;
 
-	@Autowired
-	String reportShaVariableKey;
-
 	public String processId(DelegateExecution delegateExecution) {
 		return (String) delegateExecution.getVariable(reportBranchVariableKey);
 	}

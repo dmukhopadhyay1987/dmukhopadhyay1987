@@ -19,7 +19,6 @@ public class Config {
 	private static final String PROPOSAL_REQUEST_VARIABLE_KEY = "proposalRequestDto";
 	private static final String PROPOSAL_RESPONSE_VARIABLE_KEY = "proposalResponseDto";
 	public static final String REPORT_VARIABLE_KEY = "report";
-	public static final String REPORT_SHA_VARIABLE_KEY = "reportSha";
 
 	@Bean("loanVariableKey") String loanVariableKey() {
 		return LOAN_NUMBER_VARIABLE_KEY;
@@ -39,10 +38,6 @@ public class Config {
 
 	@Bean("reportBranchVariableKey") String reportBranchVariableKey() {
 		return REPORT_VARIABLE_KEY;
-	}
-
-	@Bean("reportShaVariableKey") String reportShaVariableKey() {
-		return REPORT_SHA_VARIABLE_KEY;
 	}
 
 	@Bean
