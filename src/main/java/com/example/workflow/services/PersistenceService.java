@@ -170,7 +170,7 @@ public class PersistenceService<T> {
 					File file = c4.getFiles()
 							.stream()
 							.filter(f -> path.contains(f.getFilename()))
-							.findFirst().orElseGet(null);
+							.findFirst().orElse(null);
 					if (file != null) {
 						String date = c4.getCommitDetails().getCommitter().getDate();
 						historyMap.put(date,

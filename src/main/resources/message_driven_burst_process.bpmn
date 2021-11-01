@@ -89,7 +89,7 @@
       <bpmn:incoming>Flow_1sanum2</bpmn:incoming>
       <bpmn:outgoing>Flow_10qkdfy</bpmn:outgoing>
       <bpmn:timerEventDefinition id="TimerEventDefinition_1s56ziu">
-        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">PT1M</bpmn:timeDuration>
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">PT10S</bpmn:timeDuration>
       </bpmn:timerEventDefinition>
     </bpmn:intermediateCatchEvent>
     <bpmn:endEvent id="endRenewalBatch" name="End Renewal Batch">
@@ -102,38 +102,26 @@
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="burstRenewalProcess">
-      <bpmndi:BPMNEdge id="Flow_0l81tk7_di" bpmnElement="Flow_0l81tk7" bioc:stroke="#43a047" color:border-color="#43a047">
-        <di:waypoint x="690" y="148" />
-        <di:waypoint x="690" y="270" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1sanum2_di" bpmnElement="Flow_1sanum2" bioc:stroke="#43a047" color:border-color="#43a047">
-        <di:waypoint x="695" y="430" />
-        <di:waypoint x="695" y="512" />
+      <bpmndi:BPMNEdge id="Flow_19pnbl4_di" bpmnElement="Flow_19pnbl4" bioc:stroke="#43a047" color:border-color="#43a047">
+        <di:waypoint x="695" y="810" />
+        <di:waypoint x="695" y="912" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_10qkdfy_di" bpmnElement="Flow_10qkdfy" bioc:stroke="#43a047" color:border-color="#43a047">
         <di:waypoint x="695" y="548" />
         <di:waypoint x="695" y="640" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_19pnbl4_di" bpmnElement="Flow_19pnbl4" bioc:stroke="#43a047" color:border-color="#43a047">
-        <di:waypoint x="695" y="810" />
-        <di:waypoint x="695" y="912" />
+      <bpmndi:BPMNEdge id="Flow_1sanum2_di" bpmnElement="Flow_1sanum2" bioc:stroke="#43a047" color:border-color="#43a047">
+        <di:waypoint x="695" y="430" />
+        <di:waypoint x="695" y="512" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0l81tk7_di" bpmnElement="Flow_0l81tk7" bioc:stroke="#43a047" color:border-color="#43a047">
+        <di:waypoint x="690" y="148" />
+        <di:waypoint x="690" y="270" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="startRenewalBatch" bioc:stroke="#43a047" bioc:fill="#c8e6c9" color:background-color="#c8e6c9" color:border-color="#43a047">
         <dc:Bounds x="672" y="112" width="36" height="36" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="655" y="82" width="70" height="27" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_0aa4rl2_di" bpmnElement="choiceTimer" bioc:stroke="#43a047" bioc:fill="#c8e6c9" color:background-color="#c8e6c9" color:border-color="#43a047">
-        <dc:Bounds x="677" y="512" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="588" y="520" width="70" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_15pwdxh_di" bpmnElement="endRenewalBatch" bioc:stroke="#43a047" bioc:fill="#c8e6c9" color:background-color="#c8e6c9" color:border-color="#43a047">
-        <dc:Bounds x="677" y="912" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="662" y="955" width="66" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0rok2gn_di" bpmnElement="parallelLoanProcessor" isExpanded="true" bioc:stroke="#43a047" bioc:fill="#c8e6c9" color:background-color="#c8e6c9" color:border-color="#43a047">
@@ -155,20 +143,14 @@
         <di:waypoint x="740" y="350" />
         <di:waypoint x="830" y="350" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="Activity_0xp3ins_di" bpmnElement="getLoanInfo" bioc:stroke="#8e24aa" bioc:fill="#e1bee7" color:background-color="#e1bee7" color:border-color="#8e24aa">
-        <dc:Bounds x="460" y="310" width="100" height="80" />
+      <bpmndi:BPMNShape id="Activity_16ytvyh_di" bpmnElement="mapLoanToProposalReq" bioc:stroke="#8e24aa" bioc:fill="#e1bee7" color:background-color="#e1bee7" color:border-color="#8e24aa">
+        <dc:Bounds x="640" y="310" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_16k6y27_di" bpmnElement="getProposalInfo" bioc:stroke="#8e24aa" bioc:fill="#e1bee7" color:background-color="#e1bee7" color:border-color="#8e24aa">
         <dc:Bounds x="830" y="310" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_16ytvyh_di" bpmnElement="mapLoanToProposalReq" bioc:stroke="#8e24aa" bioc:fill="#e1bee7" color:background-color="#e1bee7" color:border-color="#8e24aa">
-        <dc:Bounds x="640" y="310" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_1e1utlf_di" bpmnElement="startOfferGen" bioc:stroke="#8e24aa" bioc:fill="#e1bee7" color:background-color="#e1bee7" color:border-color="#8e24aa">
-        <dc:Bounds x="332" y="332" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="324" y="375" width="55" height="27" />
-        </bpmndi:BPMNLabel>
+      <bpmndi:BPMNShape id="Activity_0xp3ins_di" bpmnElement="getLoanInfo" bioc:stroke="#8e24aa" bioc:fill="#e1bee7" color:background-color="#e1bee7" color:border-color="#8e24aa">
+        <dc:Bounds x="460" y="310" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_0jtb79y_di" bpmnElement="endOfferGen" bioc:stroke="#8e24aa" bioc:fill="#e1bee7" color:background-color="#e1bee7" color:border-color="#8e24aa">
         <dc:Bounds x="1032" y="332" width="36" height="36" />
@@ -176,28 +158,34 @@
           <dc:Bounds x="1023" y="375" width="55" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1e1utlf_di" bpmnElement="startOfferGen" bioc:stroke="#8e24aa" bioc:fill="#e1bee7" color:background-color="#e1bee7" color:border-color="#8e24aa">
+        <dc:Bounds x="332" y="332" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="324" y="375" width="55" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0w2hshf_di" bpmnElement="Activity_1n0bsl0" isExpanded="true" bioc:stroke="#43a047" bioc:fill="#c8e6c9" color:background-color="#c8e6c9" color:border-color="#43a047">
         <dc:Bounds x="140" y="640" width="1110" height="170" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="Flow_1vdydgj_di" bpmnElement="Flow_1vdydgj" bioc:stroke="#fb8c00" color:border-color="#fb8c00">
-        <di:waypoint x="268" y="720" />
-        <di:waypoint x="370" y="720" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0xc7rbs_di" bpmnElement="Flow_0xc7rbs" bioc:stroke="#fb8c00" color:border-color="#fb8c00">
-        <di:waypoint x="470" y="720" />
-        <di:waypoint x="560" y="720" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1fw18ye_di" bpmnElement="Flow_1fw18ye" bioc:stroke="#fb8c00" color:border-color="#fb8c00">
-        <di:waypoint x="660" y="720" />
-        <di:waypoint x="740" y="720" />
+      <bpmndi:BPMNEdge id="Flow_17qli56_di" bpmnElement="Flow_17qli56" bioc:stroke="#fb8c00" color:border-color="#fb8c00">
+        <di:waypoint x="1020" y="720" />
+        <di:waypoint x="1132" y="720" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1sy4gjv_di" bpmnElement="Flow_1sy4gjv" bioc:stroke="#fb8c00" color:border-color="#fb8c00">
         <di:waypoint x="840" y="720" />
         <di:waypoint x="920" y="720" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_17qli56_di" bpmnElement="Flow_17qli56" bioc:stroke="#fb8c00" color:border-color="#fb8c00">
-        <di:waypoint x="1020" y="720" />
-        <di:waypoint x="1132" y="720" />
+      <bpmndi:BPMNEdge id="Flow_1fw18ye_di" bpmnElement="Flow_1fw18ye" bioc:stroke="#fb8c00" color:border-color="#fb8c00">
+        <di:waypoint x="660" y="720" />
+        <di:waypoint x="740" y="720" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0xc7rbs_di" bpmnElement="Flow_0xc7rbs" bioc:stroke="#fb8c00" color:border-color="#fb8c00">
+        <di:waypoint x="470" y="720" />
+        <di:waypoint x="560" y="720" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1vdydgj_di" bpmnElement="Flow_1vdydgj" bioc:stroke="#fb8c00" color:border-color="#fb8c00">
+        <di:waypoint x="268" y="720" />
+        <di:waypoint x="370" y="720" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Event_0qtu43y_di" bpmnElement="startRenewal" bioc:stroke="#fb8c00" bioc:fill="#ffe0b2" color:background-color="#ffe0b2" color:border-color="#fb8c00">
         <dc:Bounds x="232" y="702" width="36" height="36" />
@@ -205,22 +193,34 @@
           <dc:Bounds x="216" y="745" width="70" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0znql3o_di" bpmnElement="refreshLoanInfo" bioc:stroke="#fb8c00" bioc:fill="#ffe0b2" color:background-color="#ffe0b2" color:border-color="#fb8c00">
-        <dc:Bounds x="370" y="680" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1lk2ait_di" bpmnElement="mapLoanToProposalReq2" bioc:stroke="#fb8c00" bioc:fill="#ffe0b2" color:background-color="#ffe0b2" color:border-color="#fb8c00">
-        <dc:Bounds x="560" y="680" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0u45h1s_di" bpmnElement="refreshProposalInfo" bioc:stroke="#fb8c00" bioc:fill="#ffe0b2" color:background-color="#ffe0b2" color:border-color="#fb8c00">
-        <dc:Bounds x="740" y="680" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_03lfcvx_di" bpmnElement="renewLoan" bioc:stroke="#fb8c00" bioc:fill="#ffe0b2" color:background-color="#ffe0b2" color:border-color="#fb8c00">
-        <dc:Bounds x="920" y="680" width="100" height="80" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_1b7v70a_di" bpmnElement="endRenewal" bioc:stroke="#fb8c00" bioc:fill="#ffe0b2" color:background-color="#ffe0b2" color:border-color="#fb8c00">
         <dc:Bounds x="1132" y="702" width="36" height="36" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="1117" y="745" width="66" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0znql3o_di" bpmnElement="refreshLoanInfo" bioc:stroke="#fb8c00" bioc:fill="#ffe0b2" color:background-color="#ffe0b2" color:border-color="#fb8c00">
+        <dc:Bounds x="370" y="680" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0u45h1s_di" bpmnElement="refreshProposalInfo" bioc:stroke="#fb8c00" bioc:fill="#ffe0b2" color:background-color="#ffe0b2" color:border-color="#fb8c00">
+        <dc:Bounds x="740" y="680" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1lk2ait_di" bpmnElement="mapLoanToProposalReq2" bioc:stroke="#fb8c00" bioc:fill="#ffe0b2" color:background-color="#ffe0b2" color:border-color="#fb8c00">
+        <dc:Bounds x="560" y="680" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_03lfcvx_di" bpmnElement="renewLoan" bioc:stroke="#fb8c00" bioc:fill="#ffe0b2" color:background-color="#ffe0b2" color:border-color="#fb8c00">
+        <dc:Bounds x="920" y="680" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0aa4rl2_di" bpmnElement="choiceTimer" bioc:stroke="#43a047" bioc:fill="#c8e6c9" color:background-color="#c8e6c9" color:border-color="#43a047">
+        <dc:Bounds x="677" y="512" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="588" y="520" width="70" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_15pwdxh_di" bpmnElement="endRenewalBatch" bioc:stroke="#43a047" bioc:fill="#c8e6c9" color:background-color="#c8e6c9" color:border-color="#43a047">
+        <dc:Bounds x="677" y="912" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="662" y="955" width="66" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
