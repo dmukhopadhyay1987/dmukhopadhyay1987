@@ -16,9 +16,9 @@ import java.time.format.DateTimeFormatter;
 @Slf4j
 public class BurstProcessStartListener implements ExecutionListener {
 
-	public static final String DATE_TIME_FORMAT = "yyyyMMdd/HHmm";
+	public static final String DATE_TIME_FORMAT = "yyyy-MM-dd";
 	@Autowired
-	PersistenceService<ReportInfo> persistenceService;
+	PersistenceService<ReportInfo> burstPersistenceService;
 
 	@Autowired
 	BurstProcessUtilityService burstProcessUtilityService;
@@ -33,14 +33,33 @@ public class BurstProcessStartListener implements ExecutionListener {
 		String dateTime = LocalDateTime.now().format(
 				DateTimeFormatter.ofPattern(DATE_TIME_FORMAT));
 		delegateExecution.setVariable(reportBranchVariableKey, dateTime);
-		persistenceService.save(burstProcessUtilityService.getBranchName(dateTime),
+		ReportInfo reportInfo;
+		try {
+			reportInfo = burstPersistenceService.get(burstProcessUtilityService.getQualifiedReportFilePath(
+							dateTime,
+							ReportInfo.class),
+					burstProcessUtilityService.getBranchName(dateTime),
+					ReportInfo.class);
+			reportInfo = ReportInfo.builder()
+					.startDateTime(reportInfo.getStartDateTime())
+					.loanReportInfos(reportInfo.getLoanReportInfos())
+					.endDateTime(reportInfo.getEndDateTime())
+					.lastRunTime(LocalDateTime.now()
+							.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
+					.build();
+		} catch (Exception e) {
+			reportInfo = ReportInfo.builder()
+					.startDateTime(LocalDateTime.now()
+							.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
+					.lastRunTime(LocalDateTime.now()
+							.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
+					.build();
+		}
+		burstPersistenceService.save(burstProcessUtilityService.getBranchName(dateTime),
 				burstProcessUtilityService.getQualifiedReportFilePath(
 						dateTime,
 						ReportInfo.class),
-				ReportInfo.builder()
-						.startDateTime(LocalDateTime.now()
-								.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
-						.build(),
+				reportInfo,
 				burstProcessUtilityService.commitMessage(
 						delegateExecution,
 						false));

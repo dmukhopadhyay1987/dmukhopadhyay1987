@@ -11,7 +11,7 @@
     <bpmn:transaction id="parallelLoanProcessor" name="Parallel Loan Processor">
       <bpmn:incoming>Flow_0l81tk7</bpmn:incoming>
       <bpmn:outgoing>Flow_1sanum2</bpmn:outgoing>
-      <bpmn:multiInstanceLoopCharacteristics camunda:asyncBefore="true" camunda:collection="loanNumbers" camunda:elementVariable="loanNumber" />
+      <bpmn:multiInstanceLoopCharacteristics camunda:collection="loanNumbers" camunda:elementVariable="loanNumber" />
       <bpmn:serviceTask id="mapLoanToProposalReq" name="Proposal Request Mapper" camunda:delegateExpression="${proposalRequestMapper}">
         <bpmn:incoming>Flow_0y32hgs</bpmn:incoming>
         <bpmn:outgoing>Flow_0j3zk5w</bpmn:outgoing>
@@ -46,7 +46,7 @@
     <bpmn:transaction id="Activity_1n0bsl0">
       <bpmn:incoming>Flow_10qkdfy</bpmn:incoming>
       <bpmn:outgoing>Flow_19pnbl4</bpmn:outgoing>
-      <bpmn:multiInstanceLoopCharacteristics camunda:asyncBefore="true" camunda:collection="loanNumbers" camunda:elementVariable="loanNumber" />
+      <bpmn:multiInstanceLoopCharacteristics camunda:collection="loanNumbers" camunda:elementVariable="loanNumber" />
       <bpmn:startEvent id="startRenewal" name="Start Renewal">
         <bpmn:extensionElements>
           <camunda:executionListener delegateExpression="${individualProcessStartListener}" event="start" />

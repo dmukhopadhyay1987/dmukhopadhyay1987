@@ -14,6 +14,7 @@ import java.util.List;
 public class ReportInfo {
 
 	String startDateTime;
+	String lastRunTime;
 	List<LoanReportInfo> loanReportInfos;
 	String endDateTime;
 }

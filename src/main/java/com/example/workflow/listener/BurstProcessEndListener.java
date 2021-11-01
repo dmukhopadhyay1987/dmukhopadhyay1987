@@ -48,25 +48,29 @@ public class BurstProcessEndListener implements ExecutionListener {
 						ReportInfo.class),
 				burstProcessUtilityService.getBranchName(processId),
 				ReportInfo.class);
+		List<LoanReportInfo> loanReportInfos = loanNumbers.stream()
+				.map(l -> LoanReportInfo.builder()
+						.loanNumber(l)
+						.stages(individualPersistenceService.history(
+										individualProcessUtilityService.getQualifiedLoanFilePath(l, LoanModificationInfo.class),
+										c -> c.getCommitDetails().getAuthor().getDate() != null,
+										LoanModificationInfo.class)
+								.entrySet().stream()
+								.map(lm -> LoanModificationStageInfo.builder()
+										.dateTime(lm.getKey())
+										.loanModificationInfo(lm.getValue())
+										.build())
+								.collect(Collectors.toList()))
+						.build()
+				).collect(Collectors.toList());
+		if (reportInfo.getLoanReportInfos() != null) {
+			loanReportInfos.addAll(reportInfo.getLoanReportInfos());
+		}
 		burstPersistenceService.save(burstProcessUtilityService.getBranchName(processId),
 				burstProcessUtilityService.getQualifiedReportFilePath(processId, ReportInfo.class),
 				ReportInfo.builder()
 						.startDateTime(reportInfo.getStartDateTime())
-						.loanReportInfos(loanNumbers.stream()
-								.map(l -> LoanReportInfo.builder()
-										.loanNumber(l)
-										.stages(individualPersistenceService.history(
-														individualProcessUtilityService.getQualifiedLoanFilePath(l, LoanModificationInfo.class),
-														c -> c.getCommitDetails().getAuthor().getDate() != null,
-														LoanModificationInfo.class)
-												.entrySet().stream()
-												.map(lm -> LoanModificationStageInfo.builder()
-														.dateTime(lm.getKey())
-														.loanModificationInfo(lm.getValue())
-														.build())
-												.collect(Collectors.toList()))
-										.build()
-								).collect(Collectors.toList())
+						.loanReportInfos(loanReportInfos
 						).endDateTime(
 								LocalDateTime.now()
 										.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
