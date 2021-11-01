@@ -1,7 +1,7 @@
 package com.example.workflow.mapper;
 
-import com.example.workflow.model.LoanResponseDto;
 import com.example.workflow.model.LoanModificationInfo;
+import com.example.workflow.model.LoanResponseDto;
 import com.example.workflow.model.ProposalRequestDto;
 import com.example.workflow.services.IndividualProcessUtilityService;
 import com.example.workflow.services.PersistenceService;

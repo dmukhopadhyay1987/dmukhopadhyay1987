@@ -61,12 +61,6 @@ public class PersistenceService<T> {
 		return gitClient.blob(sha).orElseThrow();
 	}
 
-	@Cacheable(cacheNames = "tree", keyGenerator = "keyGen")
-	private Tree tree(String sha) {
-		log.debug("GET tree {}", sha);
-		return gitClient.tree(sha).orElseThrow();
-	}
-
 	@Cacheable(cacheNames = "commits", keyGenerator = "keyGen")
 	private Commit commit(String sha) {
 		log.debug("GET commit {}", sha);
@@ -80,7 +74,7 @@ public class PersistenceService<T> {
 	}
 
 	private Reference branch(String branchName) {
-		log.info("Obtaining branch {}", branchName);
+		log.debug("Obtaining branch {}", branchName);
 		Reference main = ref("main").orElseThrow();
 		branchRequest.setSha(main.getObject().getSha());
 		branchRequest.setRef("refs/heads/" + branchName);
@@ -94,7 +88,7 @@ public class PersistenceService<T> {
 	}
 
 	@SneakyThrows
-	public Commit save(String branchName, String path, T payload, String message) {
+	public void save(String branchName, String path, T payload, String message) {
 		log.info("POST '{}' into '{}' for task: '{}'", path, branchName, message);
 		Reference branch = branch(branchName);
 		blobRequest.setContent(objectMapper.writeValueAsString(payload));
@@ -105,20 +99,16 @@ public class PersistenceService<T> {
 				BLOB,
 				BLOB_MODE)));
 		Tree tree = gitClient.createTree(treeRequest);
-
 		commitRequest.setTree(tree.getSha());
 		commitRequest.setMessage(message);
 		commitRequest.setParents(List.of(lastCommit.getSha()));
-		Commit commit = gitClient.createCommit(commitRequest);
-
-		branchUpdateRequest.setSha(commit.getSha());
+		branchUpdateRequest.setSha(gitClient.createCommit(commitRequest).getSha());
 		gitClient.updateBranch(branch.getRef().replace("refs/heads/", ""), branchUpdateRequest);
-		return commit;
 	}
 
 	@SneakyThrows
 	public T get(String path, String branchName, Class<T> c) {
-		log.info("GET content of '{}' and cast to {}", path, c.getSimpleName());
+		log.debug("GET content of '{}' and cast to {}", path, c.getSimpleName());
 		return decode(commit(branch(branchName).getObject().getSha())
 				.getFiles()
 				.stream().filter(f -> path.contains(f.getFilename()))
