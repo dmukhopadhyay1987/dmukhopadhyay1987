@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @EnableKafka
@@ -39,9 +40,12 @@ public class ProcessTriggerEventListener {
 			loans = new ArrayList<>();
 		} else if (message.equals("FIX")) {
 			loans = new ArrayList<>();
-			persistenceService.branches().forEach(b -> loans.add(
-					individualProcessUtilityService.retrieveLoanNumber(
-							b.getName())));
+			persistenceService.branches().stream()
+					.filter(b -> !b.getName().contains("run_"))
+					.collect(Collectors.toList())
+					.forEach(b -> loans.add(
+							individualProcessUtilityService.retrieveLoanNumber(
+									b.getName())));
 			startBurstRenewalProcess();
 		} else if (!message.equals("END")) {
 			loans.add(message);

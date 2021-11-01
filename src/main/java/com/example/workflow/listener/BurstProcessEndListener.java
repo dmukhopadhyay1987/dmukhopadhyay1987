@@ -13,6 +13,7 @@ import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -61,8 +62,9 @@ public class BurstProcessEndListener implements ExecutionListener {
 										.loanNumber(l)
 										.stages(individualPersistenceService.history(
 														individualProcessUtilityService.getQualifiedLoanFilePath(l, LoanModificationInfo.class),
-														c -> LocalDateTime.parse(c.getCommitDetails().getAuthor().getDate(), DateTimeFormatter.ISO_LOCAL_DATE_TIME).isAfter(LocalDate.now().atStartOfDay()),
-														LoanModificationInfo.class).entrySet().stream()
+														c -> c.getCommitDetails().getAuthor().getDate() != null,
+														LoanModificationInfo.class)
+												.entrySet().stream()
 												.map(lm -> LoanModificationStageInfo.builder()
 														.dateTime(lm.getKey())
 														.loanModificationInfo(lm.getValue())

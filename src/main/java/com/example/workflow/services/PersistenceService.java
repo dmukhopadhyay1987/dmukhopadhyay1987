@@ -21,6 +21,8 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
@@ -57,7 +59,7 @@ public class PersistenceService<T> {
 	@Cacheable(cacheNames = "blobs", keyGenerator = "keyGen")
 	private Blob blob(String sha) {
 		log.debug("GET blob {}", sha);
-		return gitClient.blob(sha).orElseThrow();
+		return gitClient.blob(sha).orElse(null);
 	}
 
 	@Cacheable(cacheNames = "tree", keyGenerator = "keyGen")
