@@ -35,7 +35,6 @@ import java.util.stream.Collectors;
 @EnableCaching
 public class PersistenceService<T> {
 
-	public static final String TREE = "tree";
 	public static final String BLOB = "blob";
 	public static final String BLOB_MODE = "100644";
 	@Autowired

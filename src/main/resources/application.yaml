@@ -18,9 +18,8 @@ spring:
   datasource:
     driverClassName: org.postgresql.Driver
     #DB connection:
-    url: jdbc:postgresql://localhost:5432/
-    username: postgres
-    password: Pass@2021
+    url: jdbc:postgresql://localhost:5432/sbp
+    username: sbp
   kafka:
     consumer:
       bootstrap-servers: localhost:9092
