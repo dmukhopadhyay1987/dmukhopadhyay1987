@@ -36,18 +36,14 @@ public class ProcessTriggerEventListener {
 	@KafkaListener(topics = "loanReadyForRenewal", groupId = "group")
 	public void onMessage(String message) {
 		log.info("Received Loan # {}", message);
-		if (message.equals("START")) {
-			loans = new ArrayList<>();
-		} else if (message.equals("FIX")) {
-			loans = new ArrayList<>();
+		if (!message.equals("END")) {
+			if (loans == null) loans = new ArrayList<>();
 			persistenceService.branches().stream()
 					.filter(b -> !b.getName().contains("run_"))
 					.collect(Collectors.toList())
 					.forEach(b -> loans.add(
 							individualProcessUtilityService.retrieveLoanNumber(
 									b.getName())));
-			startBurstRenewalProcess();
-		} else if (!message.equals("END")) {
 			loans.add(message);
 		} else {
 			startBurstRenewalProcess();
