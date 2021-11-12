@@ -36,9 +36,6 @@ public interface GitFeign {
 	@GetMapping("/commits/{sha}")
 	Optional<Commit> commit(@PathVariable("sha") String sha);
 
-	@GetMapping("/git/trees/{sha}")
-	Optional<Tree> tree(@PathVariable("sha") String sha);
-
 	@GetMapping("/git/blobs/{sha}")
 	Optional<Blob> blob(@PathVariable("sha") String sha);
 

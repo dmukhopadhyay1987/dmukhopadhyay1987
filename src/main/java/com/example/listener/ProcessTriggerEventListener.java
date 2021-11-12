@@ -12,9 +12,8 @@ import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Set;
+import java.util.TreeSet;
 
 @Component
 @EnableKafka
@@ -22,7 +21,7 @@ import java.util.stream.Collectors;
 public class ProcessTriggerEventListener {
 
 	@JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
-	List<String> loans;
+	Set<String> loans;
 
 	@Autowired
 	String loansVariableKey;
@@ -34,23 +33,20 @@ public class ProcessTriggerEventListener {
 	IndividualProcessUtilityService individualProcessUtilityService;
 
 	@KafkaListener(topics = "loanReadyForRenewal", groupId = "group")
-	public void onMessage(String message) {
+	public void onLoanReceived(String message) {
 		log.info("Received Loan # {}", message);
-		if (!message.equals("END")) {
-			if (loans == null) loans = new ArrayList<>();
-			persistenceService.branches().stream()
-					.filter(b -> !b.getName().contains("run_"))
-					.collect(Collectors.toList())
-					.forEach(b -> loans.add(
-							individualProcessUtilityService.retrieveLoanNumber(
-									b.getName())));
-			loans.add(message);
-		} else {
-			startBurstRenewalProcess();
-		}
+		if (loans == null) loans = new TreeSet<>();
+		persistenceService.branches().stream()
+				.filter(b -> !b.getName().contains("run_"))
+				.toList()
+				.forEach(b -> loans.add(
+						individualProcessUtilityService.retrieveLoanNumber(
+								b.getName())));
+		loans.add(message);
 	}
 
-	private void startBurstRenewalProcess() {
+	@KafkaListener(topics = "renewalProcess", groupId = "group")
+	public void onStartBurstRenewalProcess(String message) {
 		if(loans!= null && !loans.isEmpty()) {
 			ProcessEngines.getDefaultProcessEngine()
 					.getRuntimeService()

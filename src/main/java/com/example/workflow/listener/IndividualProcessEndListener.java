@@ -12,7 +12,8 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 @Slf4j
@@ -45,11 +46,14 @@ public class IndividualProcessEndListener implements ExecutionListener {
 				LoanModificationInfo.class);
 		loanModificationInfo.setEndDateTime(LocalDateTime.now().format(
 				DateTimeFormatter.ISO_DATE_TIME));
-		loanModificationInfo.setHistory(persistenceService.mergeHistory(qualifiedFilePath,
-						c -> c.getCommitDetails().getMessage().contains(loanNumber),
-						LoanModificationInfo.class)
-				.stream().peek(h -> h.setHistory(null))
-				.collect(Collectors.toList()));
+		List<LoanModificationInfo> list = new ArrayList<>();
+		for (LoanModificationInfo h : persistenceService.mergeHistory(qualifiedFilePath,
+				c -> c.getCommitDetails().getMessage().contains(loanNumber),
+				LoanModificationInfo.class)) {
+			h.setHistory(null);
+			list.add(h);
+		}
+		loanModificationInfo.setHistory(list);
 		persistenceService.save(
 				individualProcessUtilityService.getBranchName(loanNumber),
 				qualifiedFilePath,

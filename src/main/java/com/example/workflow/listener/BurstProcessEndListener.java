@@ -60,7 +60,7 @@ public class BurstProcessEndListener implements ExecutionListener {
 										.dateTime(lm.getKey())
 										.loanModificationInfo(lm.getValue())
 										.build())
-								.collect(Collectors.toList()))
+								.toList())
 						.build()
 				).collect(Collectors.toList());
 		if (reportInfo.getLoanReportInfos() != null) {
