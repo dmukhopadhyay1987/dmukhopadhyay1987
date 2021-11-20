@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @Component
 @Slf4j
-public class GetProposalInfo implements JavaDelegate {
+public class RefreshProposalInfo implements JavaDelegate {
 
 	@Autowired
 	ProposalInfoService proposalInfoService;
@@ -66,6 +66,6 @@ public class GetProposalInfo implements JavaDelegate {
 	@ExceptionHandler({Exception.class})
 	private void handleException(Exception e) {
 		log.error(e.getCause().getLocalizedMessage());
-		throw new BpmnError("offerGenerationError", e.getCause().getLocalizedMessage(), e);
+		throw new BpmnError("renewalError", e.getCause().getLocalizedMessage(), e);
 	}
 }

@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -41,7 +42,7 @@ public class BurstProcessEndListener implements ExecutionListener {
 	public void notify(DelegateExecution delegateExecution) {
 		log.info("Inside >>> {}",
 				delegateExecution.getCurrentActivityName());
-		List<String> loanNumbers = 	(List<String>) delegateExecution.getVariable(loansVariableKey);
+		Set<String> loanNumbers = 	(Set<String>) delegateExecution.getVariable(loansVariableKey);
 		String processId = burstProcessUtilityService.processId(delegateExecution);
 		ReportInfo reportInfo = burstPersistenceService.get(burstProcessUtilityService.getQualifiedReportFilePath(
 						processId,
