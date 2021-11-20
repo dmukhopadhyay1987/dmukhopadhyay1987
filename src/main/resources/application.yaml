@@ -30,3 +30,20 @@ spring:
 
 #logging.level.com.example.feign.GitFeign: DEBUG
 #feign.client.config.default.loggerLevel: full
+
+app:
+  sample:
+    config:
+      keys:
+        loanNumber: 'loanNumber'
+        loanNumbers: 'loanNumbers'
+        proposalRequest: 'proposalRequestDto'
+        proposalResponse: 'proposalResponseDto'
+        report: 'report'
+
+db:
+  iwonosql:
+    connection:
+      url: https://api.github.com/repos/<USER_NAME>/<REPO_NAME>
+      auth:
+        key: <PERSONAL_ACCESS_TOKEN>

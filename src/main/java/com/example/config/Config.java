@@ -7,37 +7,42 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.deser.std.StringDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
 @Configuration
+@AllArgsConstructor
 public class Config {
 
-	private static final String LOAN_NUMBER_VARIABLE_KEY = "loanNumber";
-	private static final String LOAN_NUMBERS_VARIABLE_KEY = "loanNumbers";
-	private static final String PROPOSAL_REQUEST_VARIABLE_KEY = "proposalRequestDto";
-	private static final String PROPOSAL_RESPONSE_VARIABLE_KEY = "proposalResponseDto";
-	public static final String REPORT_VARIABLE_KEY = "report";
+	@Autowired
+	private ConfigProperties keyConfig;
+//	private static final String LOAN_NUMBER_VARIABLE_KEY = "loanNumber";
+//	private static final String LOAN_NUMBERS_VARIABLE_KEY = "loanNumbers";
+//	private static final String PROPOSAL_REQUEST_VARIABLE_KEY = "proposalRequestDto";
+//	private static final String PROPOSAL_RESPONSE_VARIABLE_KEY = "proposalResponseDto";
+//	public static final String REPORT_VARIABLE_KEY = "report";
 
 	@Bean("loanVariableKey") String loanVariableKey() {
-		return LOAN_NUMBER_VARIABLE_KEY;
+		return keyConfig.getLoanNumber();
 	}
 
 	@Bean("loansVariableKey") String loansVariableKey() {
-		return LOAN_NUMBERS_VARIABLE_KEY;
+		return keyConfig.getLoanNumbers();
 	}
 
 	@Bean("proposalRequestVariableKey") String proposalRequestVariableKey() {
-		return PROPOSAL_REQUEST_VARIABLE_KEY;
+		return keyConfig.getProposalRequest();
 	}
 
 	@Bean("proposalResponseVariableKey") String proposalResponseVariableKey() {
-		return PROPOSAL_RESPONSE_VARIABLE_KEY;
+		return keyConfig.getProposalResponse();
 	}
 
 	@Bean("reportBranchVariableKey") String reportBranchVariableKey() {
-		return REPORT_VARIABLE_KEY;
+		return keyConfig.getReport();
 	}
 
 	@Bean

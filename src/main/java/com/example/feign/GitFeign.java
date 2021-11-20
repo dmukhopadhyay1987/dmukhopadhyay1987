@@ -25,8 +25,8 @@ import java.util.List;
 import java.util.Optional;
 
 @FeignClient(name = "gitHubClient",
-		url = "https://api.github.com/repos/dmukhopadhyay1987/iwonosql",
-		configuration = { GitFeignConfig.class},
+		url = "${db.iwonosql.connection.url}",
+		configuration = { GitFeignConfig.class },
 		decode404 = true)
 public interface GitFeign {
 
