@@ -28,7 +28,7 @@ spring:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
 
-#logging.level.com.example.feign.GitFeign: DEBUG
+#logging.level.com.samplebpm.feign.GitFeign: DEBUG
 #feign.client.config.default.loggerLevel: full
 
 app:
