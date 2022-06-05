@@ -2,7 +2,7 @@ package com.samplebpm.workflow.listener;
 
 import com.samplebpm.workflow.model.LoanModificationInfo;
 import com.samplebpm.workflow.services.IndividualProcessUtilityService;
-import com.samplebpm.workflow.services.PersistenceService;
+import com.iwonosql.service.PersistenceService;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;

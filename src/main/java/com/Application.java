@@ -1,4 +1,4 @@
-package com.samplebpm;
+package com;
 
 import org.dozer.DozerBeanMapper;
 import org.springframework.boot.SpringApplication;

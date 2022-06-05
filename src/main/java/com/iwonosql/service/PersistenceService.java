@@ -1,4 +1,4 @@
-package com.samplebpm.workflow.services;
+package com.iwonosql.service;
 
 import com.iwonosql.feign.GitFeign;
 import com.iwonosql.feign.model.BlobRequest;

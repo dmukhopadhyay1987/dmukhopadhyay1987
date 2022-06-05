@@ -5,7 +5,7 @@ import com.samplebpm.workflow.model.LoanStatus;
 import com.samplebpm.workflow.model.ProposalRequestDto;
 import com.samplebpm.workflow.model.ProposalResponseDto;
 import com.samplebpm.workflow.services.IndividualProcessUtilityService;
-import com.samplebpm.workflow.services.PersistenceService;
+import com.iwonosql.service.PersistenceService;
 import com.samplebpm.workflow.services.ProposalInfoService;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.BpmnError;
