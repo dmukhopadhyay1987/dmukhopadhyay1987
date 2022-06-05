@@ -1,6 +1,6 @@
-package com.samplebpm.feign.model;
+package com.iwonosql.feign.model;
 
-import com.samplebpm.feign.model.vo.TreeDetail;
+import com.iwonosql.feign.model.vo.TreeDetail;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;

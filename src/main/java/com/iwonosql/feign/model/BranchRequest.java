@@ -1,7 +1,6 @@
-package com.samplebpm.feign.model;
+package com.iwonosql.feign.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -12,12 +11,10 @@ import javax.validation.constraints.NotNull;
 @Data
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class MergeRequest {
+public class BranchRequest {
 
 	@NotNull
-	String base;
+	String sha;
 	@NotNull
-	String head;
-	@JsonProperty("commit_message")
-	String commitMessage;
+	String ref;
 }

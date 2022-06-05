@@ -1,4 +1,4 @@
-package com.samplebpm.feign.config;
+package com.iwonosql.feign.config;
 
 import feign.RequestInterceptor;
 import feign.okhttp.OkHttpClient;

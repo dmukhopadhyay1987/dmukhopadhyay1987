@@ -1,15 +1,19 @@
-package com.samplebpm.feign.model;
+package com.iwonosql.feign.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 @Data
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class BranchUpdateRequest {
+public class CommitRequest {
 
-	String sha;
+	String tree;
+	String message;
+	List<String> parents;
 }

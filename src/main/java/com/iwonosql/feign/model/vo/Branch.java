@@ -1,7 +1,6 @@
-package com.samplebpm.feign.model.vo;
+package com.iwonosql.feign.model.vo;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -9,12 +8,10 @@ import lombok.NonNull;
 @Data
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Blob {
+public class Branch {
 
 	@NonNull
-	private String sha;
-	private Long size;
-	@NonNull
-	@JsonProperty("content")
-	private String base64content;
+	String name;
+	Commit commit;
+	boolean isProtected;
 }

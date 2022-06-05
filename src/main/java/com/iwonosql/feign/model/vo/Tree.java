@@ -1,24 +1,20 @@
-package com.samplebpm.feign.model.vo;
+package com.iwonosql.feign.model.vo;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
 @Data
 @NoArgsConstructor
-@RequiredArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Commit {
+public class Tree {
 
 	@NonNull
 	private String sha;
-	@JsonProperty("commit")
-	private CommitDetails commitDetails;
-	private List<Commit> parents;
-	private List<File> files;
+	@JsonProperty("tree")
+	private List<TreeDetail> treeDetail;
 }

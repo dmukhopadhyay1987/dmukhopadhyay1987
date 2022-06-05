@@ -1,17 +1,20 @@
-package com.samplebpm.feign.model.vo;
+package com.iwonosql.feign.model.vo;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 @Data
 @NoArgsConstructor
+@RequiredArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Branch {
+public class CommitDetails {
 
 	@NonNull
-	String name;
-	Commit commit;
-	boolean isProtected;
+	private String message;
+	private Tree tree;
+	private User author;
+	private User committer;
 }

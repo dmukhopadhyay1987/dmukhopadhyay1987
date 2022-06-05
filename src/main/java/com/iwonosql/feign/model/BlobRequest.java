@@ -1,4 +1,4 @@
-package com.samplebpm.feign.model;
+package com.iwonosql.feign.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
